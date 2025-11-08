@@ -15,9 +15,84 @@ class UserProfile(models.Model):
     ]
 
     user_type = models.CharField(max_length=10, choices=PERMISSION_CHOICES, default=PERMISSION_PLAYER)
+    
+    # Rangsor / Leaderboard mezők
+    osszes_gyozelem = models.IntegerField(default=0, verbose_name="Összes győzelem")
+    osszes_vereseg = models.IntegerField(default=0, verbose_name="Összes vereség")
+    legmagasabb_sorozat = models.IntegerField(default=0, verbose_name="Leghosszabb győzelmi sorozat")
+    jelenlegi_sorozat = models.IntegerField(default=0, verbose_name="Jelenlegi győzelmi sorozat")
+    osszes_pontszam = models.IntegerField(default=0, verbose_name="Összes pontszám")
 
     def __str__(self):
         return f"{self.user.username} ({self.get_user_type_display()})"
+    
+    def gyozelem_hozzaad(self):
+        """Győzelem hozzáadása és sorozat frissítése"""
+        self.osszes_gyozelem += 1
+        self.jelenlegi_sorozat += 1
+        self.osszes_pontszam += 10
+        
+        if self.jelenlegi_sorozat > self.legmagasabb_sorozat:
+            self.legmagasabb_sorozat = self.jelenlegi_sorozat
+        
+        self.save()
+    
+    def vereseg_hozzaad(self):
+        """Vereség hozzáadása és sorozat nullázása"""
+        self.osszes_vereseg += 1
+        self.jelenlegi_sorozat = 0
+        self.save()
+    
+    def get_gyozelem_arany(self):
+        """Visszaadja a győzelmi arányt százalékban"""
+        osszes_harc = self.osszes_gyozelem + self.osszes_vereseg
+        if osszes_harc == 0:
+            return 0
+        return round((self.osszes_gyozelem / osszes_harc) * 100, 1)
+
+
+# Achievement modell
+class Achievement(models.Model):
+    nev = models.CharField(max_length=100, unique=True, verbose_name="Név")
+    leiras = models.TextField(verbose_name="Leírás")
+    ikon = models.CharField(max_length=10, default='🏆', verbose_name="Ikon (emoji)")
+    tipus = models.CharField(max_length=50, verbose_name="Típus")
+    cel_ertek = models.IntegerField(verbose_name="Cél érték")
+    pontok = models.IntegerField(default=10, verbose_name="Pontok")
+    
+    class Meta:
+        verbose_name = "Achievement"
+        verbose_name_plural = "Achievementek"
+    
+    def __str__(self):
+        return f"{self.ikon} {self.nev}"
+
+
+# Játékos achievementjei
+class PlayerAchievement(models.Model):
+    jatekos = models.ForeignKey(User, on_delete=models.CASCADE, related_name='achievementek')
+    achievement = models.ForeignKey(Achievement, on_delete=models.CASCADE)
+    megszerzve = models.DateTimeField(auto_now_add=True, verbose_name="Megszerzve")
+    jelenlegi_haladás = models.IntegerField(default=0, verbose_name="Jelenlegi haladás")
+    
+    class Meta:
+        verbose_name = "Játékos Achievement"
+        verbose_name_plural = "Játékos Achievementek"
+        unique_together = [['jatekos', 'achievement']]
+    
+    def __str__(self):
+        return f"{self.jatekos.username} - {self.achievement.nev}"
+    
+    @property
+    def teljesitve(self):
+        """Igaz, ha az achievement teljesítve van"""
+        return self.jelenlegi_haladás >= self.achievement.cel_ertek
+    
+    def get_haladás_szazalek(self):
+        """Visszaadja a haladást százalékban"""
+        if self.achievement.cel_ertek == 0:
+            return 100
+        return min(100, round((self.jelenlegi_haladás / self.achievement.cel_ertek) * 100, 1))
 
 
 # Elem típusok konstansai
@@ -292,6 +367,7 @@ class Harc(models.Model):
     inditas = models.DateTimeField(auto_now_add=True, verbose_name="Indítás")
     befejezve = models.BooleanField(default=False, verbose_name="Befejezve")
     jatekos_gyozott = models.BooleanField(null=True, blank=True, verbose_name="Játékos győzött")
+    rangsor_frissitve = models.BooleanField(default=False, verbose_name="Rangsor frissítve")
     
     class Meta:
         verbose_name = "Harc"

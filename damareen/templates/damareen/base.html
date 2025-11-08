@@ -31,84 +31,240 @@
         }
         
         header {
-            background: linear-gradient(135deg, rgba(139, 69, 19, 0.3) 0%, rgba(101, 67, 33, 0.5) 100%);
-            padding: 30px;
-            border-radius: 15px;
+            background: linear-gradient(135deg, 
+                rgba(20, 20, 40, 0.95) 0%, 
+                rgba(30, 25, 50, 0.95) 50%,
+                rgba(20, 20, 40, 0.95) 100%);
+            padding: 35px 40px;
+            border-radius: 20px;
             margin-bottom: 30px;
             box-shadow: 
-                0 10px 40px rgba(0,0,0,0.5),
-                inset 0 1px 0 rgba(255,255,255,0.1),
-                0 0 20px rgba(218, 165, 32, 0.3);
-            border: 2px solid rgba(218, 165, 32, 0.5);
+                0 15px 50px rgba(0,0,0,0.6),
+                inset 0 2px 0 rgba(255,255,255,0.15),
+                inset 0 -2px 0 rgba(0,0,0,0.5),
+                0 0 60px rgba(218, 165, 32, 0.3);
+            border: 4px solid transparent;
+            background-clip: padding-box;
             position: relative;
             overflow: hidden;
+            animation: headerPulse 4s ease-in-out infinite;
         }
         
         header::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(218, 165, 32, 0.03) 10px,
-                rgba(218, 165, 32, 0.03) 20px
-            );
-            animation: shine 20s linear infinite;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(45deg, 
+                #daa520 0%, 
+                #ffd700 25%, 
+                #daa520 50%, 
+                #b8860b 75%, 
+                #daa520 100%);
+            background-size: 400% 400%;
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.8;
+            animation: borderGradient 6s ease infinite, borderPulse 2s ease-in-out infinite;
         }
         
-        @keyframes shine {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.15) 50%, 
+                transparent 100%);
+            animation: shimmerSweep 4s ease-in-out infinite;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        @keyframes headerPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 15px 50px rgba(0,0,0,0.6),
+                    inset 0 2px 0 rgba(255,255,255,0.15),
+                    inset 0 -2px 0 rgba(0,0,0,0.5),
+                    0 0 60px rgba(218, 165, 32, 0.3);
+            }
+            50% {
+                box-shadow: 
+                    0 18px 60px rgba(0,0,0,0.7),
+                    inset 0 2px 0 rgba(255,255,255,0.2),
+                    inset 0 -2px 0 rgba(0,0,0,0.5),
+                    0 0 80px rgba(218, 165, 32, 0.5);
+            }
+        }
+        
+        @keyframes borderGradient {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        
+        @keyframes borderPulse {
+            0%, 100% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes shimmerSweep {
+            0% {
+                left: -100%;
+            }
+            50%, 100% {
+                left: 100%;
+            }
         }
         
         header h1 {
             font-family: 'Cinzel', serif;
-            color: #daa520;
-            font-size: 3.5em;
-            margin-bottom: 10px;
+            color: #ffd700;
+            font-size: 3.8em;
+            margin-bottom: 12px;
             text-align: center;
             text-shadow: 
-                0 0 10px rgba(218, 165, 32, 0.8),
-                0 0 20px rgba(218, 165, 32, 0.5),
-                2px 2px 4px rgba(0,0,0,0.8);
-            letter-spacing: 4px;
+                0 0 20px rgba(255, 215, 0, 0.9),
+                0 0 40px rgba(218, 165, 32, 0.7),
+                0 0 60px rgba(218, 165, 32, 0.5),
+                3px 3px 6px rgba(0,0,0,0.9);
+            letter-spacing: 6px;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            animation: titleGlow 3s ease-in-out infinite;
+            font-weight: 700;
+            transform-style: preserve-3d;
+        }
+        
+        @keyframes titleGlow {
+            0%, 100% {
+                text-shadow: 
+                    0 0 20px rgba(255, 215, 0, 0.9),
+                    0 0 40px rgba(218, 165, 32, 0.7),
+                    0 0 60px rgba(218, 165, 32, 0.5),
+                    3px 3px 6px rgba(0,0,0,0.9);
+            }
+            50% {
+                text-shadow: 
+                    0 0 30px rgba(255, 215, 0, 1),
+                    0 0 60px rgba(218, 165, 32, 0.9),
+                    0 0 90px rgba(218, 165, 32, 0.7),
+                    3px 3px 6px rgba(0,0,0,0.9);
+            }
+        }
+        
+        header > p {
+            text-align: center;
+            color: #daa520;
+            margin-bottom: 18px;
+            font-size: 1.1em;
+            font-style: italic;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            animation: subtitleFade 3s ease-in-out infinite;
+            font-weight: 600;
+        }
+        
+        @keyframes subtitleFade {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
         }
         
         nav {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 18px;
             flex-wrap: wrap;
-            margin-top: 20px;
+            margin-top: 25px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        nav a {
+            color: #ffd700;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 700;
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+            background: linear-gradient(135deg, 
+                rgba(20, 20, 40, 0.8) 0%, 
+                rgba(30, 25, 50, 0.8) 100%);
+            border: 3px solid rgba(218, 165, 32, 0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 6px 20px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.15),
+                inset 0 -1px 0 rgba(0,0,0,0.3);
+        }
+        
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        nav a:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        nav a span {
             position: relative;
             z-index: 1;
         }
         
-        nav a {
-            color: #daa520;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            transition: all 0.3s;
-            font-weight: 600;
-            font-family: 'Cinzel', serif;
-            background: rgba(20, 20, 40, 0.6);
-            border: 2px solid rgba(218, 165, 32, 0.4);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        nav a:hover {
+            background: linear-gradient(135deg, 
+                rgba(218, 165, 32, 0.4) 0%, 
+                rgba(139, 69, 19, 0.4) 100%);
+            border-color: #ffd700;
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 
+                0 10px 30px rgba(218, 165, 32, 0.5),
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                inset 0 -1px 0 rgba(0,0,0,0.3),
+                0 0 30px rgba(218, 165, 32, 0.4);
+            text-shadow: 
+                0 0 15px rgba(255, 215, 0, 0.8),
+                0 2px 4px rgba(0,0,0,0.8);
         }
         
-        nav a:hover {
-            background: rgba(218, 165, 32, 0.3);
-            border-color: #daa520;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(218, 165, 32, 0.4);
+        nav a:active {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 6px 20px rgba(218, 165, 32, 0.4),
+                inset 0 1px 0 rgba(255,255,255,0.1);
         }
         
         .content {
@@ -422,9 +578,30 @@
         
         .user-info {
             text-align: right;
-            color: #daa520;
-            font-weight: 600;
+            color: #ffd700;
+            font-weight: 700;
             font-family: 'Cinzel', serif;
+            position: relative;
+            z-index: 2;
+            font-size: 16px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+            padding: 10px 15px;
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 10px;
+            border: 2px solid rgba(218, 165, 32, 0.4);
+            display: block;
+            animation: userInfoPulse 2s ease-in-out infinite;
+            backdrop-filter: blur(5px);
+            margin-bottom: 15px;
+        }
+        
+        @keyframes userInfoPulse {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(218, 165, 32, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 25px rgba(218, 165, 32, 0.4);
+            }
         }
         
         h2, h3, h4 {
@@ -467,8 +644,11 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'damareen:player_dashboard' %}">🎮 Játékos</a>
                     <a href="{% url 'damareen:master_dashboard' %}">🎲 Játékmester</a>
+                    <a href="{% url 'damareen:leaderboard' %}">🏆 Rangsor</a>
+                    <a href="{% url 'damareen:achievements' %}">⭐ Achievementek</a>
                     <a href="{% url 'damareen:logout' %}">🚪 Kijelentkezés</a>
                 {% else %}
+                    <a href="{% url 'damareen:leaderboard' %}">🏆 Rangsor</a>
                     <a href="{% url 'damareen:login' %}">🔑 Bejelentkezés</a>
                     <a href="{% url 'damareen:register' %}">📝 Regisztráció</a>
                 {% endif %}

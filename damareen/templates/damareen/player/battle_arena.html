@@ -6,6 +6,8 @@
     <title>⚔️ Harc - {{ kazamata.nev }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -31,137 +33,398 @@
             gap: 12px;
         }
         
-        /* Top Bar - Compact */
+        /* Top Bar - Enhanced */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(20, 20, 40, 0.8);
-            padding: 10px 25px;
-            border-radius: 10px;
-            border: 2px solid rgba(218, 165, 32, 0.3);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            background: linear-gradient(135deg, 
+                rgba(20, 20, 40, 0.95) 0%, 
+                rgba(30, 25, 50, 0.95) 50%,
+                rgba(20, 20, 40, 0.95) 100%);
+            padding: 15px 30px;
+            border-radius: 15px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 25px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.1),
+                inset 0 -1px 0 rgba(0,0,0,0.3);
+            animation: headerGlow 3s ease-in-out infinite;
+        }
+        
+        .top-bar::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                #daa520 0%, 
+                #ffd700 25%, 
+                #daa520 50%, 
+                #b8860b 75%, 
+                #daa520 100%);
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0.6;
+            animation: borderShine 4s linear infinite;
+        }
+        
+        .top-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.1) 50%, 
+                transparent 100%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes headerGlow {
+            0%, 100% {
+                box-shadow: 
+                    0 8px 25px rgba(0,0,0,0.5),
+                    inset 0 1px 0 rgba(255,255,255,0.1),
+                    inset 0 -1px 0 rgba(0,0,0,0.3),
+                    0 0 30px rgba(218, 165, 32, 0.2);
+            }
+            50% {
+                box-shadow: 
+                    0 8px 35px rgba(0,0,0,0.6),
+                    inset 0 1px 0 rgba(255,255,255,0.15),
+                    inset 0 -1px 0 rgba(0,0,0,0.3),
+                    0 0 50px rgba(218, 165, 32, 0.4);
+            }
+        }
+        
+        @keyframes borderShine {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+        
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            50%, 100% {
+                left: 100%;
+            }
         }
         
         .kazamata-title {
             font-family: 'Cinzel', serif;
-            font-size: 22px;
-            color: #daa520;
-            text-shadow: 0 0 15px rgba(218, 165, 32, 0.6);
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffd700;
+            text-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.8),
+                0 0 40px rgba(218, 165, 32, 0.6),
+                2px 2px 4px rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+            animation: titlePulse 2s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .kazamata-title::before {
+            content: '⚔️';
+            font-size: 28px;
+            animation: iconBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(218, 165, 32, 0.8));
+        }
+        
+        @keyframes titlePulse {
+            0%, 100% {
+                text-shadow: 
+                    0 0 20px rgba(255, 215, 0, 0.8),
+                    0 0 40px rgba(218, 165, 32, 0.6),
+                    2px 2px 4px rgba(0, 0, 0, 0.8);
+            }
+            50% {
+                text-shadow: 
+                    0 0 30px rgba(255, 215, 0, 1),
+                    0 0 60px rgba(218, 165, 32, 0.8),
+                    2px 2px 4px rgba(0, 0, 0, 0.8);
+            }
+        }
+        
+        @keyframes iconBounce {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-3px) rotate(-5deg);
+            }
+            75% {
+                transform: translateY(-3px) rotate(5deg);
+            }
         }
         
         .top-actions {
             display: flex;
-            gap: 12px;
+            gap: 15px;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
         
         .btn {
-            padding: 10px 22px;
+            padding: 12px 28px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-family: 'Cinzel', serif;
-            font-size: 15px;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none;
             display: inline-block;
-            font-weight: 600;
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn span {
+            position: relative;
+            z-index: 1;
         }
         
         .btn-danger {
             background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
             color: white;
-            border: 2px solid #dc2626;
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+            border: 3px solid #dc2626;
+            box-shadow: 
+                0 6px 20px rgba(220, 38, 38, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
         
         .btn-danger:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 10px 30px rgba(220, 38, 38, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+            border-color: #ff4444;
+        }
+        
+        .btn-danger:active:not(:disabled) {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 
+                0 4px 15px rgba(220, 38, 38, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
         
         .btn-danger:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
+            filter: grayscale(30%);
+            transform: none;
         }
         
         .btn-secondary {
             background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
             color: white;
-            border: 2px solid #4b5563;
+            border: 3px solid #4b5563;
+            box-shadow: 
+                0 6px 20px rgba(75, 85, 99, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
         
         .btn-secondary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(75, 85, 99, 0.6);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 10px 30px rgba(75, 85, 99, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+            border-color: #6b7280;
         }
         
-        /* Battle Info - Compact */
+        .btn-secondary:active {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 
+                0 4px 15px rgba(75, 85, 99, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Battle Info - Enhanced */
         .battle-info {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 25px;
-            background: linear-gradient(135deg, rgba(218, 165, 32, 0.15) 0%, rgba(139, 69, 19, 0.15) 100%);
-            padding: 12px 20px;
-            border-radius: 10px;
-            border: 2px solid rgba(218, 165, 32, 0.3);
+            gap: 30px;
+            background: linear-gradient(135deg, 
+                rgba(218, 165, 32, 0.2) 0%, 
+                rgba(139, 69, 19, 0.2) 50%,
+                rgba(218, 165, 32, 0.2) 100%);
+            padding: 15px 25px;
+            border-radius: 15px;
+            border: 3px solid rgba(218, 165, 32, 0.4);
+            box-shadow: 
+                0 6px 20px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .battle-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(218, 165, 32, 0.1) 0%, 
+                transparent 70%);
+            animation: rotateGlow 10s linear infinite;
+        }
+        
+        @keyframes rotateGlow {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
         
         .score-display {
             display: flex;
             align-items: center;
-            gap: 15px;
-            background: rgba(20, 20, 40, 0.9);
-            padding: 10px 35px;
+            gap: 20px;
+            background: linear-gradient(135deg, 
+                rgba(20, 20, 40, 0.95) 0%, 
+                rgba(30, 25, 50, 0.95) 100%);
+            padding: 15px 40px;
             border-radius: 50px;
-            border: 3px solid rgba(218, 165, 32, 0.5);
+            border: 4px solid rgba(218, 165, 32, 0.6);
             font-family: 'Cinzel', serif;
-            font-size: 2em;
+            font-size: 2.2em;
             font-weight: 700;
+            position: relative;
+            z-index: 1;
+            box-shadow: 
+                0 8px 25px rgba(0,0,0,0.6),
+                inset 0 2px 0 rgba(255,255,255,0.1),
+                0 0 40px rgba(218, 165, 32, 0.3);
         }
         
         .score-player {
             color: #64b5f6;
-            text-shadow: 0 0 15px rgba(100, 181, 246, 0.8);
-            transition: transform 0.3s ease;
+            text-shadow: 
+                0 0 20px rgba(100, 181, 246, 0.9),
+                0 0 40px rgba(100, 181, 246, 0.6),
+                2px 2px 4px rgba(0, 0, 0, 0.8);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         
         .score-separator {
             color: #daa520;
             font-size: 1.2em;
+            text-shadow: 0 0 15px rgba(218, 165, 32, 0.8);
+            animation: separatorPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes separatorPulse {
+            0%, 100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
         }
         
         .score-enemy {
             color: #ff6b6b;
-            text-shadow: 0 0 15px rgba(255, 107, 107, 0.8);
-            transition: transform 0.3s ease;
+            text-shadow: 
+                0 0 20px rgba(255, 107, 107, 0.9),
+                0 0 40px rgba(255, 107, 107, 0.6),
+                2px 2px 4px rgba(0, 0, 0, 0.8);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         
         .round-info {
             font-family: 'Cinzel', serif;
-            font-size: 16px;
-            color: #daa520;
-            background: rgba(20, 20, 40, 0.6);
-            padding: 6px 18px;
-            border-radius: 20px;
-            border: 2px solid rgba(218, 165, 32, 0.4);
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffd700;
+            background: linear-gradient(135deg, 
+                rgba(20, 20, 40, 0.8) 0%, 
+                rgba(30, 25, 50, 0.8) 100%);
+            padding: 10px 24px;
+            border-radius: 25px;
+            border: 3px solid rgba(218, 165, 32, 0.5);
+            position: relative;
+            z-index: 1;
+            box-shadow: 
+                0 4px 15px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
         
         .status-message {
-            font-size: 15px;
-            color: #cbd5e0;
+            font-size: 16px;
+            color: #e0e0e0;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 20px;
+            background: rgba(20, 20, 40, 0.6);
+            border-radius: 20px;
+            border: 2px solid rgba(218, 165, 32, 0.3);
         }
         
         .loading-spinner {
             display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #daa520;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(218, 165, 32, 0.2);
+            border-top-color: #ffd700;
+            border-right-color: #daa520;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
+            box-shadow: 0 0 10px rgba(218, 165, 32, 0.3);
         }
         
         @keyframes spin {
@@ -475,34 +738,33 @@
         /* Animations - Smooth and realistic card flip */
         @keyframes cardFlipIn {
             0% { 
-                transform: rotateY(180deg) scale(0.8); 
-                opacity: 0; 
+                transform: rotateY(180deg) translateZ(0px); 
+                opacity: 0;
+                filter: blur(4px);
             }
-            40% {
-                transform: rotateY(90deg) scale(0.95);
-                opacity: 0.5;
-            }
-            60% {
-                transform: rotateY(45deg) scale(0.98);
-                opacity: 0.8;
+            50% { 
+                transform: rotateY(90deg) translateZ(20px); 
+                opacity: 0.6;
+                filter: blur(2px);
             }
             100% { 
-                transform: rotateY(0deg) scale(1); 
-                opacity: 1; 
+                transform: rotateY(0deg) translateZ(0px); 
+                opacity: 1;
+                filter: blur(0px);
             }
         }
         
         @keyframes cardFlipToFront {
             0% { 
-                transform: rotateY(180deg) scale(1);
+                transform: rotateY(180deg) translateZ(0px);
                 opacity: 1;
             }
             50% { 
-                transform: rotateY(90deg) scale(1.05);
-                opacity: 0.7;
+                transform: rotateY(90deg) translateZ(20px);
+                opacity: 0.8;
             }
             100% { 
-                transform: rotateY(0deg) scale(1);
+                transform: rotateY(0deg) translateZ(0px);
                 opacity: 1;
             }
         }
@@ -606,18 +868,20 @@
             opacity: 1;
             transform-style: preserve-3d;
             transition: none;
+            will-change: transform, opacity;
+            backface-visibility: hidden;
         }
         
         .battle-card.revealed {
-            animation: cardFlipIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation: cardFlipIn 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
         }
         
         .battle-card.attacking {
-            animation: cardAttack 1s ease-in-out;
+            animation: cardAttack 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
         
         .battle-card.damaged {
-            animation: damageShake 0.6s ease-in-out;
+            animation: damageShake 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
         
         .battle-card.victory {
@@ -967,22 +1231,206 @@
         
         function handleBattleAnimation(data) {
             const winner = data.winner;
+            const playerElement = data.player_element;
+            const enemyElement = data.enemy_element;
             
             setTimeout(() => {
                 const playerCard = playerCardSlot.querySelector('.battle-card');
                 const enemyCard = enemyCardSlot.querySelector('.battle-card');
                 
-                if (playerCard) playerCard.classList.add('attacking');
-                if (enemyCard) enemyCard.classList.add('attacking');
+                // Create attack animations based on card type
+                if (winner === 'player') {
+                    createAttackEffect(playerCardSlot, enemyCardSlot, playerElement);
+                    
+                    if (playerCard) {
+                        anime({
+                            targets: playerCard,
+                            translateX: [0, 50, 0],
+                            scale: [1, 1.1, 1],
+                            rotate: [0, 5, 0],
+                            duration: 800,
+                            easing: 'easeInOutQuad'
+                        });
+                    }
+                } else {
+                    createAttackEffect(enemyCardSlot, playerCardSlot, enemyElement);
+                    
+                    if (enemyCard) {
+                        anime({
+                            targets: enemyCard,
+                            translateX: [0, -50, 0],
+                            scale: [1, 1.1, 1],
+                            rotate: [0, -5, 0],
+                            duration: 800,
+                            easing: 'easeInOutQuad'
+                        });
+                    }
+                }
                 
                 setTimeout(() => {
-                    if (playerCard) playerCard.classList.remove('attacking');
-                    if (enemyCard) enemyCard.classList.remove('attacking');
-                    
                     const loser = winner === 'player' ? enemyCard : playerCard;
-                    if (loser) loser.classList.add('damaged');
-                }, 1200);
+                    const loserSlot = winner === 'player' ? enemyCardSlot : playerCardSlot;
+                    
+                    if (loser) {
+                        anime({
+                            targets: loser,
+                            translateX: [
+                                {value: -15, duration: 50},
+                                {value: 15, duration: 50},
+                                {value: -10, duration: 50},
+                                {value: 10, duration: 50},
+                                {value: 0, duration: 50}
+                            ],
+                            filter: [
+                                {value: 'brightness(1.5) contrast(1.3)', duration: 100},
+                                {value: 'brightness(0.7) contrast(1.3)', duration: 100},
+                                {value: 'brightness(1)', duration: 100}
+                            ],
+                            easing: 'easeInOutQuad'
+                        });
+                        
+                        // Create damage effect
+                        createDamageEffect(loserSlot);
+                    }
+                }, 600);
             }, 100);
+        }
+        
+        function createAttackEffect(fromSlot, toSlot, element) {
+            const fromRect = fromSlot.getBoundingClientRect();
+            const toRect = toSlot.getBoundingClientRect();
+            
+            const startX = fromRect.left + fromRect.width / 2;
+            const startY = fromRect.top + fromRect.height / 2;
+            const endX = toRect.left + toRect.width / 2;
+            const endY = toRect.top + toRect.height / 2;
+            
+            // Create particle container
+            const particleContainer = document.createElement('div');
+            particleContainer.id = 'attack-particles-' + Date.now();
+            particleContainer.style.position = 'fixed';
+            particleContainer.style.top = '0';
+            particleContainer.style.left = '0';
+            particleContainer.style.width = '100vw';
+            particleContainer.style.height = '100vh';
+            particleContainer.style.pointerEvents = 'none';
+            particleContainer.style.zIndex = '999';
+            document.body.appendChild(particleContainer);
+            
+            // Element-specific particle effects
+            const elementConfig = {
+                'tuz': {
+                    emoji: '🔥',
+                    colors: ['#ff4444', '#ff6b6b', '#ff8c42', '#ffa500'],
+                    count: 25,
+                    size: [20, 40]
+                },
+                'viz': {
+                    emoji: '💧',
+                    colors: ['#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe'],
+                    count: 30,
+                    size: [15, 35]
+                },
+                'fold': {
+                    emoji: '🌿',
+                    colors: ['#22c55e', '#4ade80', '#86efac', '#bbf7d0'],
+                    count: 20,
+                    size: [18, 38]
+                },
+                'levego': {
+                    emoji: '💨',
+                    colors: ['#a855f7', '#c084fc', '#d8b4fe', '#e9d5ff'],
+                    count: 35,
+                    size: [12, 30]
+                }
+            };
+            
+            const config = elementConfig[element] || elementConfig['tuz'];
+            
+            // Create and animate particles
+            for (let i = 0; i < config.count; i++) {
+                const particle = document.createElement('div');
+                particle.textContent = config.emoji;
+                particle.style.position = 'absolute';
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+                particle.style.fontSize = (Math.random() * (config.size[1] - config.size[0]) + config.size[0]) + 'px';
+                particle.style.pointerEvents = 'none';
+                particle.style.filter = `drop-shadow(0 0 10px ${config.colors[i % config.colors.length]})`;
+                particleContainer.appendChild(particle);
+                
+                // Animate particle
+                const angle = Math.atan2(endY - startY, endX - startX);
+                const spread = (Math.random() - 0.5) * 0.8;
+                const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                
+                anime({
+                    targets: particle,
+                    translateX: Math.cos(angle + spread) * distance + (Math.random() - 0.5) * 100,
+                    translateY: Math.sin(angle + spread) * distance + (Math.random() - 0.5) * 100,
+                    scale: [1, Math.random() * 0.5 + 0.5, 0],
+                    rotate: Math.random() * 720 - 360,
+                    opacity: [1, 0.8, 0],
+                    duration: 800 + Math.random() * 400,
+                    easing: 'easeOutCubic',
+                    delay: Math.random() * 100
+                });
+            }
+            
+            // Remove particle container after animation
+            setTimeout(() => {
+                particleContainer.remove();
+            }, 1500);
+        }
+        
+        function createDamageEffect(slot) {
+            // Create impact flash
+            const flash = document.createElement('div');
+            flash.style.position = 'absolute';
+            flash.style.top = '0';
+            flash.style.left = '0';
+            flash.style.width = '100%';
+            flash.style.height = '100%';
+            flash.style.background = 'rgba(255, 255, 255, 0.8)';
+            flash.style.borderRadius = '15px';
+            flash.style.pointerEvents = 'none';
+            flash.style.zIndex = '100';
+            slot.style.position = 'relative';
+            slot.appendChild(flash);
+            
+            anime({
+                targets: flash,
+                opacity: [0.8, 0],
+                duration: 300,
+                easing: 'easeOutQuad',
+                complete: () => flash.remove()
+            });
+            
+            // Create crack/damage lines
+            for (let i = 0; i < 5; i++) {
+                const crack = document.createElement('div');
+                crack.style.position = 'absolute';
+                crack.style.top = '50%';
+                crack.style.left = '50%';
+                crack.style.width = '2px';
+                crack.style.height = '0';
+                crack.style.background = 'rgba(255, 50, 50, 0.8)';
+                crack.style.transformOrigin = 'top';
+                crack.style.transform = `rotate(${Math.random() * 360}deg)`;
+                crack.style.pointerEvents = 'none';
+                crack.style.zIndex = '99';
+                slot.appendChild(crack);
+                
+                anime({
+                    targets: crack,
+                    height: [0, Math.random() * 80 + 40],
+                    opacity: [1, 0],
+                    duration: 400,
+                    delay: i * 30,
+                    easing: 'easeOutQuad',
+                    complete: () => crack.remove()
+                });
+            }
         }
         
         function handleRoundResult(data) {

@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     UserProfile, Vilagkartya, Vezerkartya, Kazamata, KazamataKartya,
     JatekKornyezet, GyujtemenyKartya, Jatek, Jatekoskartya,
-    Pakli, PakliKartya, Harc, Utközet
+    Pakli, PakliKartya, Harc, Utközet, Achievement, PlayerAchievement
 )
 
 
@@ -24,8 +24,10 @@ class PakliKartyaInline(admin.TabularInline):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'user_type']
+    list_display = ['user', 'user_type', 'osszes_pontszam', 'osszes_gyozelem', 'osszes_vereseg', 'legmagasabb_sorozat']
     list_filter = ['user_type']
+    search_fields = ['user__username']
+    readonly_fields = ['osszes_pontszam', 'osszes_gyozelem', 'osszes_vereseg', 'legmagasabb_sorozat', 'jelenlegi_sorozat']
 
 
 @admin.register(Vilagkartya)
@@ -89,3 +91,23 @@ class HarcAdmin(admin.ModelAdmin):
 class UtközetAdmin(admin.ModelAdmin):
     list_display = ['harc', 'sorrend', 'jatekos_kartya', 'jatekos_nyert']
     list_filter = ['jatekos_nyert']
+
+
+@admin.register(Achievement)
+class AchievementAdmin(admin.ModelAdmin):
+    list_display = ['nev', 'ikon', 'tipus', 'cel_ertek', 'pontok']
+    list_filter = ['tipus']
+    search_fields = ['nev', 'leiras']
+
+
+@admin.register(PlayerAchievement)
+class PlayerAchievementAdmin(admin.ModelAdmin):
+    list_display = ['jatekos', 'achievement', 'jelenlegi_haladás', 'teljesitve', 'megszerzve']
+    list_filter = ['achievement', 'megszerzve']
+    search_fields = ['jatekos__username', 'achievement__nev']
+    readonly_fields = ['megszerzve']
+    
+    def teljesitve(self, obj):
+        return obj.teljesitve
+    teljesitve.boolean = True
+    teljesitve.short_description = 'Teljesítve'

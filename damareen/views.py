@@ -10,9 +10,10 @@ from .models import (
     UserProfile, JatekKornyezet, Jatek, Jatekoskartya,
     Pakli, PakliKartya, Kazamata, Harc, Vilagkartya,
     Vezerkartya, GyujtemenyKartya, KazamataKartya,
+    Achievement, PlayerAchievement,
     ELEMENT_FIRE, ELEMENT_EARTH, ELEMENT_WATER, ELEMENT_AIR
 )
-from .game_logic import harc_vegrehajtasa, jutalom_alkalmazasa
+from .game_logic import harc_vegrehajtasa, jutalom_alkalmazasa, frissit_rangsort
 from .forms import KazamataForm, VilagkartyaForm, VezerkartyaForm
 
 
@@ -280,6 +281,12 @@ def harc_eredmeny(request, jatek_id, harc_id):
     """Harc eredményének megtekintése"""
     jatek = get_object_or_404(Jatek, id=jatek_id, jatekos=request.user)
     harc = get_object_or_404(Harc, id=harc_id, jatek=jatek)
+    
+    # Rangsor frissítése (csak egyszer)
+    if harc.befejezve and not harc.rangsor_frissitve:
+        frissit_rangsort(request.user, harc.jatekos_gyozott)
+        harc.rangsor_frissitve = True
+        harc.save(update_fields=['rangsor_frissitve'])
     
     utközetek = harc.utközetek.all()
     
@@ -578,4 +585,92 @@ def delete_kazamata(request, kazamata_id):
     
     return render(request, 'damareen/master/delete_kazamata.html', {
         'kazamata': kazamata
+    })
+
+
+# ============= RANGSOR ÉS ACHIEVEMENTEK =============
+
+def leaderboard(request):
+    """Rangsor - legjobb játékosok listája"""
+    # Top 50 játékos pontszám szerint
+    top_players = UserProfile.objects.filter(
+        user_type=UserProfile.PERMISSION_PLAYER
+    ).select_related('user').order_by('-osszes_pontszam', '-osszes_gyozelem')[:50]
+    
+    # Aktuális felhasználó rangja
+    current_user_rank = None
+    current_user_profile = None
+    
+    if request.user.is_authenticated:
+        try:
+            current_user_profile = request.user.userprofile
+            # Megkeressük a rangját
+            all_profiles = UserProfile.objects.filter(
+                user_type=UserProfile.PERMISSION_PLAYER
+            ).order_by('-osszes_pontszam', '-osszes_gyozelem')
+            
+            for idx, profile in enumerate(all_profiles, 1):
+                if profile.user == request.user:
+                    current_user_rank = idx
+                    break
+        except UserProfile.DoesNotExist:
+            pass
+    
+    return render(request, 'damareen/leaderboard.html', {
+        'top_players': top_players,
+        'current_user_rank': current_user_rank,
+        'current_user_profile': current_user_profile
+    })
+
+
+@login_required
+def my_achievements(request):
+    """Saját achievementek megtekintése"""
+    # Összes achievement
+    all_achievements = Achievement.objects.all().order_by('cel_ertek', 'nev')
+    
+    # Játékos achievementjei
+    player_achievements = PlayerAchievement.objects.filter(
+        jatekos=request.user
+    ).select_related('achievement')
+    
+    #Dict létrehozása gyors kereséshez
+    player_ach_dict = {pa.achievement.id: pa for pa in player_achievements}
+    
+    # Achievement lista előkészítése haladással
+    achievements_with_progress = []
+    for achievement in all_achievements:
+        player_ach = player_ach_dict.get(achievement.id)
+        
+        if player_ach:
+            achievements_with_progress.append({
+                'achievement': achievement,
+                'haladás': player_ach.jelenlegi_haladás,
+                'teljesitve': player_ach.teljesitve,
+                'szazalek': player_ach.get_haladás_szazalek(),
+                'megszerzve': player_ach.megszerzve if player_ach.teljesitve else None
+            })
+        else:
+            achievements_with_progress.append({
+                'achievement': achievement,
+                'haladás': 0,
+                'teljesitve': False,
+                'szazalek': 0,
+                'megszerzve': None
+            })
+    
+    # Statisztikák
+    teljesitett_szam = sum(1 for a in achievements_with_progress if a['teljesitve'])
+    osszes_szam = len(achievements_with_progress)
+    
+    try:
+        profile = request.user.userprofile
+    except UserProfile.DoesNotExist:
+        profile = None
+    
+    return render(request, 'damareen/achievements.html', {
+        'achievements': achievements_with_progress,
+        'teljesitett_szam': teljesitett_szam,
+        'osszes_szam': osszes_szam,
+        'profile': profile
     })

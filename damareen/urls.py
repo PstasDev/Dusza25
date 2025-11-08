@@ -46,4 +46,8 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('register/', views.user_register, name='register'),
+    
+    # Rangsor és achievementek
+    path('leaderboard/', views.leaderboard, name='leaderboard'),
+    path('achievements/', views.my_achievements, name='achievements'),
 ]

@@ -47,7 +47,18 @@ Ez létrehoz egy teljes játékvilágot:
 - 4 kazamatát (Egyszerű, 2 Kis, 1 Nagy)
 - Egy "Középfölde kalandjai" nevű játékkörnyezetet kezdő gyűjteménnyel
 
-### 6. Szerver indítása
+### 6. Achievementek inicializálása
+
+```cmd
+python manage.py init_achievements
+```
+
+Ez létrehozza az alapértelmezett achievementeket:
+- 4 győzelmi achievement
+- 3 sorozat achievement
+- 1 kitartás achievement
+
+### 7. Szerver indítása
 
 ```cmd
 python manage.py runserver
@@ -181,9 +192,82 @@ Dusza25/
    - 🔧 Tranzakció-biztos műveletek
    - 🔧 Optimalizált adatbázis lekérdezések
 
+4. **Rangsor és Achievementek:** 🆕
+   - 🏆 **Rangsor rendszer:** Legjobb 50 játékos listája pontszám alapján
+   - 📊 **Statisztikák:** Győzelmek, vereségek, győzelmi arány, sorozatok
+   - ⭐ **Achievement rendszer:** 8 különböző achievement kategória
+   - 🎯 **Haladás követés:** Részletes progress bar minden achievementnél
+   - 🥇 **Érmek és rangok:** Első 3 helyezett különleges kiemelése
+   - 💎 **Pontrendszer:** Achievementek és győzelmek pontokat adnak
+
+## 🏆 Rangsor és Achievementek
+
+### Rangsor Funkciók
+- **Top 50 játékos** megjelenítése pontszám szerint rangsorolva
+- **Saját rang** kijelzése és kiemelése a listában
+- **Részletes statisztikák:**
+  - Összes pontszám (achievementek + győzelmek)
+  - Győzelmek és vereségek száma
+  - Győzelmi arány (%)
+  - Leghosszabb győzelmi sorozat
+- **Vizuális kiemelés:** Arany/ezüst/bronz érmek az első 3 helyen
+- **Színkódolt eredmények:** Win rate alapján zöld/sárga/piros jelzés
+
+### Achievement Rendszer
+
+#### Elérhető Achievementek:
+
+**Győzelem Achievementek:**
+- 🎯 **Első győzelem** - Nyerd meg az első csatádat! (10 pont)
+- ⚔️ **Veterán** - Nyerj meg 10 csatát! (50 pont)
+- 👑 **Bajnok** - Nyerj meg 50 csatát! (200 pont)
+- 🏆 **Legenda** - Nyerj meg 100 csatát! (500 pont)
+
+**Győzelmi Sorozat Achievementek:**
+- 🔥 **Lendületben** - Nyerj meg 3 csatát egymás után! (25 pont)
+- 💪 **Legyőzhetetlen** - Nyerj meg 5 csatát egymás után! (75 pont)
+- ⚡ **Halhatatlan** - Nyerj meg 10 csatát egymás után! (250 pont)
+
+**Kitartás Achievement:**
+- 💔 **Kitartó** - Veszíts el 10 csatát, de ne add fel! (20 pont)
+
+#### Achievement Jellemzők:
+- **Automatikus követés:** A játék automatikusan frissíti a haladást
+- **Progress bar:** Vizuális visszajelzés az előrehaladásról
+- **Dátum jelzés:** Minden teljesített achievementnél megjelenik a megszerzés időpontja
+- **Pontjutalom:** Teljesítéskor automatikus pontszám növelés
+- **Szűrt nézet:** Teljesített/nem teljesített achievementek elkülönítése
+
+### Hogyan Működik?
+
+1. **Harc után automatikus frissítés:**
+   - Győzelem esetén: +10 pont, győzelmi sorozat növelése
+   - Vereség esetén: sorozat nullázása
+   - Achievement haladás frissítése
+
+2. **Rangsor számítás:**
+   - Pontszám = (Győzelmek × 10) + Achievement pontok
+   - Rangsorolás: Pontszám > Győzelmek száma
+
+3. **Achievement teljesítés:**
+   - Automatikus felismerés célérték elérésekor
+   - Egyszeri pontjutalom
+   - Permanens megjelenítés teljesítettként
+
+### Elérés:
+- **Rangsor:** Navigációs menü → 🏆 Rangsor
+- **Achievementek:** Navigációs menü → ⭐ Achievementek
+- Vagy a játékos műszerfalról az újábból
+
 ## ❌ Nem implementált funkciók
 
 Nincs, minden feladat követelmény teljesült!
+
+**Plusz implementált funkciók:**
+- ✅ Rangsor rendszer (legjobb 50 játékos)
+- ✅ Achievement rendszer (8 achievement kategória)
+- ✅ Automatikus statisztika követés
+- ✅ Pontrendszer és jutalmak
 
 ## 🐛 Hibakezelés
 
@@ -196,8 +280,8 @@ Nincs, minden feladat követelmény teljesült!
 ## 🔮 Továbbfejlesztési lehetőségek
 
 1. **Multiplayer mód:** Játékosok egymás ellen
-2. **Rangsor:** Legjobb játékosok listája
-3. **Achievementek:** Teljesítmények gyűjtése
+2. ~~**Rangsor:** Legjobb játékosok listája~~ ✅ **IMPLEMENTÁLVA**
+3. ~~**Achievementek:** Teljesítmények gyűjtése~~ ✅ **IMPLEMENTÁLVA**
 4. **Kártya animációk:** Harc során animált ütközetek
 5. **Export/Import:** Játékkörnyezetek megosztása
 6. **Statisztikák:** Játékos teljesítmény grafikonok

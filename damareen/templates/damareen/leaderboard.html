@@ -1,0 +1,246 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Rangsor - Damareen{% endblock %}
+
+{% block extra_css %}
+<style>
+    .leaderboard-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .leaderboard-title {
+        text-align: center;
+        font-size: 2.5em;
+        margin-bottom: 30px;
+        color: #ffd700;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+    
+    .leaderboard-table {
+        width: 100%;
+        background: linear-gradient(135deg, rgba(30, 30, 50, 0.7) 0%, rgba(20, 20, 40, 0.7) 100%);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .leaderboard-table table {
+        margin: 0;
+    }
+    
+    .leaderboard-table th {
+        background: linear-gradient(135deg, rgba(139, 69, 19, 0.6) 0%, rgba(101, 67, 33, 0.6) 100%);
+        padding: 20px 15px;
+        font-size: 1.1em;
+    }
+    
+    .leaderboard-table td {
+        padding: 18px 15px;
+        font-size: 1.1em;
+    }
+    
+    .rank-cell {
+        font-weight: 700;
+        font-family: 'Cinzel', serif;
+        font-size: 1.3em;
+    }
+    
+    .rank-1 {
+        color: #ffd700;
+        text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    }
+    
+    .rank-2 {
+        color: #c0c0c0;
+        text-shadow: 0 0 15px rgba(192, 192, 192, 0.6);
+    }
+    
+    .rank-3 {
+        color: #cd7f32;
+        text-shadow: 0 0 15px rgba(205, 127, 50, 0.6);
+    }
+    
+    .current-user-row {
+        background: rgba(218, 165, 32, 0.2) !important;
+        border-left: 4px solid #ffd700;
+        animation: highlightPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes highlightPulse {
+        0%, 100% {
+            background: rgba(218, 165, 32, 0.2) !important;
+        }
+        50% {
+            background: rgba(218, 165, 32, 0.3) !important;
+        }
+    }
+    
+    .stat-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        margin: 0 3px;
+    }
+    
+    .win-badge {
+        background: rgba(46, 125, 50, 0.4);
+        color: #90ee90;
+    }
+    
+    .loss-badge {
+        background: rgba(211, 47, 47, 0.4);
+        color: #ff6b6b;
+    }
+    
+    .streak-badge {
+        background: rgba(255, 152, 0, 0.4);
+        color: #ffb74d;
+    }
+    
+    .points-badge {
+        background: rgba(218, 165, 32, 0.4);
+        color: #ffd700;
+        font-size: 1.2em;
+    }
+    
+    .win-rate {
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+    
+    .win-rate-high {
+        background: rgba(46, 125, 50, 0.4);
+        color: #90ee90;
+    }
+    
+    .win-rate-medium {
+        background: rgba(255, 152, 0, 0.4);
+        color: #ffb74d;
+    }
+    
+    .win-rate-low {
+        background: rgba(211, 47, 47, 0.4);
+        color: #ff6b6b;
+    }
+    
+    .my-rank-card {
+        background: linear-gradient(135deg, rgba(218, 165, 32, 0.3) 0%, rgba(139, 69, 19, 0.3) 100%);
+        border: 3px solid #ffd700;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 30px rgba(218, 165, 32, 0.4);
+        text-align: center;
+    }
+    
+    .my-rank-card h3 {
+        color: #ffd700;
+        margin-bottom: 15px;
+        font-size: 1.5em;
+    }
+    
+    .my-rank-number {
+        font-size: 3em;
+        color: #ffd700;
+        font-weight: 700;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+    }
+    
+    .medal {
+        font-size: 2em;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    <h2 class="leaderboard-title">🏆 Rangsor - Legjobb Játékosok</h2>
+    
+    {% if current_user_profile and current_user_rank %}
+    <div class="my-rank-card">
+        <h3>📊 Saját Rangod</h3>
+        <div class="my-rank-number">#{{ current_user_rank }}</div>
+        <div style="margin-top: 15px;">
+            <span class="points-badge stat-badge">⭐ {{ current_user_profile.osszes_pontszam }} pont</span>
+            <span class="win-badge stat-badge">✅ {{ current_user_profile.osszes_gyozelem }} győzelem</span>
+            <span class="loss-badge stat-badge">❌ {{ current_user_profile.osszes_vereseg }} vereség</span>
+            <span class="streak-badge stat-badge">🔥 {{ current_user_profile.legmagasabb_sorozat }} sorozat</span>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="leaderboard-table">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 80px;">Rang</th>
+                    <th>Játékos</th>
+                    <th style="text-align: center;">Pontszám</th>
+                    <th style="text-align: center;">Győzelem</th>
+                    <th style="text-align: center;">Vereség</th>
+                    <th style="text-align: center;">Arány</th>
+                    <th style="text-align: center;">Sorozat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in top_players %}
+                <tr {% if user.is_authenticated and profile.user == user %}class="current-user-row"{% endif %}>
+                    <td class="rank-cell {% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
+                        {% if forloop.counter == 1 %}
+                            <span class="medal">🥇</span>#{{ forloop.counter }}
+                        {% elif forloop.counter == 2 %}
+                            <span class="medal">🥈</span>#{{ forloop.counter }}
+                        {% elif forloop.counter == 3 %}
+                            <span class="medal">🥉</span>#{{ forloop.counter }}
+                        {% else %}
+                            #{{ forloop.counter }}
+                        {% endif %}
+                    </td>
+                    <td style="font-weight: 600; color: #f0e6d2;">
+                        {{ profile.user.username }}
+                        {% if user.is_authenticated and profile.user == user %}
+                            <span style="color: #ffd700;">(Te)</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="points-badge stat-badge">{{ profile.osszes_pontszam }}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="win-badge stat-badge">{{ profile.osszes_gyozelem }}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="loss-badge stat-badge">{{ profile.osszes_vereseg }}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        {% with win_rate=profile.get_gyozelem_arany %}
+                            <span class="win-rate {% if win_rate >= 70 %}win-rate-high{% elif win_rate >= 40 %}win-rate-medium{% else %}win-rate-low{% endif %}">
+                                {{ win_rate }}%
+                            </span>
+                        {% endwith %}
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="streak-badge stat-badge">🔥 {{ profile.legmagasabb_sorozat }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #cbd5e0;">
+                        Még nincsenek játékosok a rangsorban. Légy te az első!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="{% url 'damareen:player_dashboard' %}" class="btn">🎮 Játékos Műszerfal</a>
+        <a href="{% url 'damareen:achievements' %}" class="btn btn-success">🏆 Achievementek</a>
+    </div>
+</div>
+{% endblock %}

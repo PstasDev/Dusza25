@@ -162,7 +162,9 @@ class BattleConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({
                     'type': 'battle_animation',
                     'round': round_num,
-                    'winner': 'player' if jatekos_nyert else 'enemy'
+                    'winner': 'player' if jatekos_nyert else 'enemy',
+                    'player_element': pakli_kartya['element'],
+                    'enemy_element': kazamata_kartya['element']
                 }))
                 
                 await asyncio.sleep(1.5)
