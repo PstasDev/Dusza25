@@ -1,0 +1,54 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Vezérkártya törlése{% endblock %}
+
+{% block content %}
+<h2>🗑️ Vezérkártya törlése</h2>
+
+<div class="card" style="border-left-color: #e74c3c;">
+    <h3 style="color: #ff6b6b;">⚠️ Biztosan törölni szeretnéd?</h3>
+    
+    <div class="kartya kartya-{{ kartya.tipus }}" style="max-width: 300px; margin: 30px auto; border-width: 4px;">
+        <div style="text-align: center; margin-bottom: 10px;">
+            <span style="background: linear-gradient(135deg, #daa520 0%, #ffd700 100%); color: #1a1a2e; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                👑 VEZÉR
+            </span>
+        </div>
+        <h3>{{ kartya.nev }}</h3>
+        <p style="font-size: 14px; color: #cbd5e0; text-align: center; margin-bottom: 10px;">
+            Származik: {{ kartya.eredeti_kartya.nev }}
+        </p>
+        <div class="kartya-stat">
+            <span>⚔️ Sebzés:</span>
+            <span style="color: #daa520;">{{ kartya.sebzes }}</span>
+        </div>
+        <div class="kartya-stat">
+            <span>❤️ Életerő:</span>
+            <span style="color: #e74c3c;">{{ kartya.eletero }}</span>
+        </div>
+        <div style="margin-top: 10px; text-align: center;">
+            <span class="elem-icon elem-{{ kartya.tipus }}">
+                {{ kartya.get_tipus_display }}
+            </span>
+        </div>
+        <p style="margin-top: 10px; text-align: center; font-size: 13px; color: #daa520;">
+            {{ kartya.get_duplazas_tipusa_display }}
+        </p>
+    </div>
+    
+    <p style="color: #ff6b6b; text-align: center; font-size: 18px; margin: 20px 0;">
+        Ez a művelet nem visszavonható! A vezért használó kazamaták is érintettek lesznek!
+    </p>
+    
+    <form method="post" style="text-align: center;">
+        {% csrf_token %}
+        
+        <button type="submit" class="btn btn-danger">
+            ✅ Igen, törlöm
+        </button>
+        <a href="{% url 'damareen:manage_vezerkartyak' %}" class="btn btn-secondary">
+            Mégse
+        </a>
+    </form>
+</div>
+{% endblock %}

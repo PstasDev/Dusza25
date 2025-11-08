@@ -1,0 +1,75 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Világkártya szerkesztése{% endblock %}
+
+{% block content %}
+<h2>✏️ Világkártya szerkesztése</h2>
+
+<div class="card">
+    <h3>Jelenlegi kártya:</h3>
+    <div class="kartya kartya-{{ kartya.tipus }}" style="max-width: 300px; margin: 20px auto;">
+        <h3>{{ kartya.nev }}</h3>
+        <div class="kartya-stat">
+            <span>⚔️ Sebzés:</span>
+            <span style="color: #daa520;">{{ kartya.sebzes }}</span>
+        </div>
+        <div class="kartya-stat">
+            <span>❤️ Életerő:</span>
+            <span style="color: #e74c3c;">{{ kartya.eletero }}</span>
+        </div>
+        <div style="margin-top: 10px; text-align: center;">
+            <span class="elem-icon elem-{{ kartya.tipus }}">
+                {{ kartya.get_tipus_display }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <h3>Módosítás:</h3>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="nev">Kártya neve: *</label>
+            <input type="text" id="nev" name="nev" required maxlength="16"
+                   value="{{ kartya.nev }}">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="sebzes">Sebzés: *</label>
+                <input type="number" id="sebzes" name="sebzes" required 
+                       min="2" max="100" value="{{ kartya.sebzes }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="eletero">Életerő: *</label>
+                <input type="number" id="eletero" name="eletero" required 
+                       min="1" max="100" value="{{ kartya.eletero }}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="tipus">Típus: *</label>
+            <select id="tipus" name="tipus" required>
+                {% for value, label in elem_choices %}
+                <option value="{{ value }}" {% if kartya.tipus == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn btn-success">
+                ✅ Módosítások mentése
+            </button>
+            <a href="{% url 'damareen:manage_vilagkartyak' %}" class="btn btn-secondary">
+                Mégse
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

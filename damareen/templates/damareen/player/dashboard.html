@@ -1,0 +1,68 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Játékos műszerfal - Damareen{% endblock %}
+
+{% block content %}
+<h2>🎮 Játékos műszerfal</h2>
+
+<div class="card">
+    <h3>Folyamatban lévő játékok</h3>
+    
+    {% if jatekok %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Játékkörnyezet</th>
+                    <th>Indítás</th>
+                    <th>Utolsó aktivitás</th>
+                    <th>Műveletek</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for jatek in jatekok %}
+                <tr>
+                    <td><strong>{{ jatek.kornyezet.nev }}</strong></td>
+                    <td>{{ jatek.inditas|date:"Y.m.d H:i" }}</td>
+                    <td>{{ jatek.utolso_aktivitas|date:"Y.m.d H:i" }}</td>
+                    <td>
+                        <a href="{% url 'damareen:game_view' jatek.id %}" class="btn">
+                            Folytatás
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="padding: 20px; text-align: center; color: #666;">
+            Még nincs folyamatban lévő játékod. Indíts egyet az alábbi környezetek közül!
+        </p>
+    {% endif %}
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <h3>Elérhető játékkörnyezetek</h3>
+    
+    {% if kornyezetek %}
+        <div class="grid">
+            {% for kornyezet in kornyezetek %}
+            <div class="card" style="border: 2px solid #667eea;">
+                <h4>{{ kornyezet.nev }}</h4>
+                <p><small>Készítette: {{ kornyezet.keszitette.username }}</small></p>
+                <p><small>Létrehozva: {{ kornyezet.letrehozva|date:"Y.m.d" }}</small></p>
+                
+                <div style="margin-top: 15px;">
+                    <a href="{% url 'damareen:start_game' kornyezet.id %}" class="btn btn-success">
+                        🎮 Játék indítása
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="padding: 20px; text-align: center; color: #666;">
+            Még nincs elérhető játékkörnyezet. Kérj meg egy játékmestert, hogy hozzon létre egyet!
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

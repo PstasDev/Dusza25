@@ -1,0 +1,44 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Új játékkörnyezet{% endblock %}
+
+{% block content %}
+<h2>➕ Új játékkörnyezet létrehozása</h2>
+
+<div class="card">
+    <h3>Alapadatok</h3>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="nev">Játékkörnyezet neve:</label>
+            <input type="text" id="nev" name="nev" required 
+                   placeholder="pl. Középfölde kalandjai">
+        </div>
+        
+        <button type="submit" class="btn btn-success">
+            ✅ Létrehozás
+        </button>
+        <a href="{% url 'damareen:master_dashboard' %}" class="btn btn-secondary">
+            Mégse
+        </a>
+    </form>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <h3>ℹ️ További beállítások</h3>
+    <p>A létrehozás után tudod beállítani:</p>
+    <ul>
+        <li>Kezdő gyűjtemény kártyáit</li>
+        <li>Elérhető kazamatákat</li>
+    </ul>
+    <p style="color: #cbd5e0; margin-top: 10px; font-size: 14px;">
+        <strong>💡 Tipp:</strong> A világkártyákat, vezéreket és kazamatákat a 
+        <a href="{% url 'damareen:manage_vilagkartyak' %}" style="color: #daa520;">világkártya kezelő</a>, 
+        <a href="{% url 'damareen:manage_vezerkartyak' %}" style="color: #daa520;">vezérkártya kezelő</a> és 
+        <a href="{% url 'damareen:manage_kazamatak' %}" style="color: #daa520;">kazamata kezelő</a> 
+        oldalakon kezelheted.
+    </p>
+</div>
+{% endblock %}

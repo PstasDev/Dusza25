@@ -1,0 +1,70 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Új világkártya{% endblock %}
+
+{% block content %}
+<h2>➕ Új világkártya létrehozása</h2>
+
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="nev">Kártya neve: *</label>
+            <input type="text" id="nev" name="nev" required maxlength="16"
+                   placeholder="Max. 16 karakter">
+            <small style="color: #cbd5e0; display: block; margin-top: 5px;">
+                Egyedi névnek kell lennie!
+            </small>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label for="sebzes">Sebzés: *</label>
+                <input type="number" id="sebzes" name="sebzes" required 
+                       min="2" max="100" value="2">
+                <small style="color: #cbd5e0; display: block; margin-top: 5px;">
+                    Min: 2, Max: 100
+                </small>
+            </div>
+            
+            <div class="form-group">
+                <label for="eletero">Életerő: *</label>
+                <input type="number" id="eletero" name="eletero" required 
+                       min="1" max="100" value="1">
+                <small style="color: #cbd5e0; display: block; margin-top: 5px;">
+                    Min: 1, Max: 100
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="tipus">Típus: *</label>
+            <select id="tipus" name="tipus" required>
+                {% for value, label in elem_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn btn-success">
+                ✅ Kártya létrehozása
+            </button>
+            <a href="{% url 'damareen:manage_vilagkartyak' %}" class="btn btn-secondary">
+                Mégse
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <h3>💡 Tippek</h3>
+    <ul style="line-height: 2; color: #cbd5e0;">
+        <li>A név maximum 16 karakter lehet és egyedinek kell lennie</li>
+        <li>Sebzés: 2-100 között (hány sebzést okoz)</li>
+        <li>Életerő: 1-100 között (mennyi sebzést bír ki)</li>
+        <li>Típusok előnyei: Tűz > Föld > Víz > Levegő > Tűz</li>
+    </ul>
+</div>
+{% endblock %}

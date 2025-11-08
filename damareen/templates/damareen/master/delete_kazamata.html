@@ -1,0 +1,132 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Kazamata törlése{% endblock %}
+
+{% block content %}
+<h2>🗑️ Kazamata törlése</h2>
+
+<div class="card" style="border-left-color: #e74c3c;">
+    <h3 style="color: #ff6b6b;">⚠️ Biztosan törölni szeretnéd?</h3>
+    
+    <div style="background: rgba(26, 26, 46, 0.6); padding: 25px; border-radius: 12px; margin: 30px 0; border: 2px solid 
+        {% if kazamata.tipus == 'egyszeru' %}#9b59b6
+        {% elif kazamata.tipus == 'kis' %}#3498db
+        {% else %}#e74c3c{% endif %};">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: 
+                {% if kazamata.tipus == 'egyszeru' %}#9b59b6
+                {% elif kazamata.tipus == 'kis' %}#3498db
+                {% else %}#e74c3c{% endif %}; font-size: 24px;">
+                🏰 {{ kazamata.nev }}
+            </h3>
+            <span style="background: linear-gradient(135deg, 
+                {% if kazamata.tipus == 'egyszeru' %}#9b59b6 0%, #8e44ad 100%
+                {% elif kazamata.tipus == 'kis' %}#3498db 0%, #2980b9 100%
+                {% else %}#e74c3c 0%, #c0392b 100%{% endif %}); 
+                color: white; padding: 6px 14px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                {{ kazamata.get_tipus_display }}
+            </span>
+        </div>
+        
+        <div style="background: rgba(218, 165, 32, 0.15); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
+                <div>
+                    <div style="color: #64748b; font-size: 12px;">Bónusz</div>
+                    <div style="color: #daa520; font-weight: bold; font-size: 16px;">
+                        {% if kazamata.tipus == 'egyszeru' %}+1 ⚔️
+                        {% elif kazamata.tipus == 'kis' %}+2 ❤️
+                        {% else %}+3 ⚔️{% endif %}
+                    </div>
+                </div>
+                <div>
+                    <div style="color: #64748b; font-size: 12px;">Kártyák száma</div>
+                    <div style="color: #cbd5e0; font-weight: bold; font-size: 16px;">
+                        {{ kazamata.kartyak.count }}
+                    </div>
+                </div>
+                <div>
+                    <div style="color: #64748b; font-size: 12px;">Kapacitás</div>
+                    <div style="color: #cbd5e0; font-weight: bold; font-size: 16px;">
+                        {% if kazamata.tipus == 'egyszeru' %}1
+                        {% elif kazamata.tipus == 'kis' %}4
+                        {% else %}6{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if kazamata.kartyak.exists %}
+            <h4 style="color: #daa520; margin-bottom: 12px;">🃏 Tartalmazott kártyák:</h4>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                {% for kk in kazamata.kartyak.all %}
+                    <div style="background: rgba(26, 26, 46, 0.8); padding: 10px; border-radius: 6px; border-left: 3px solid 
+                        {% if kk.kartya.tipus == 'TUZ' %}#ff4757
+                        {% elif kk.kartya.tipus == 'FOLD' %}#8b4513
+                        {% elif kk.kartya.tipus == 'VIZ' %}#3498db
+                        {% else %}#1dd1a1{% endif %}; display: flex; justify-content: space-between; align-items: center;">
+                        
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="background: rgba(218, 165, 32, 0.3); color: #daa520; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                                #{{ kk.sorrend }}
+                            </span>
+                            <span style="font-weight: bold; color: 
+                                {% if kk.kartya.tipus == 'TUZ' %}#ff4757
+                                {% elif kk.kartya.tipus == 'FOLD' %}#8b4513
+                                {% elif kk.kartya.tipus == 'VIZ' %}#3498db
+                                {% else %}#1dd1a1{% endif %};">
+                                {{ kk.kartya.nev }}
+                            </span>
+                            {% if kk.is_vezer %}
+                                <span style="color: #daa520; font-size: 16px;" title="Vezérkártya">👑</span>
+                            {% endif %}
+                        </div>
+                        <div style="font-size: 12px; color: #94a3b8;">
+                            <span>⚔️ {{ kk.kartya.sebzes }}</span>
+                            <span style="margin-left: 10px;">❤️ {{ kk.kartya.eletero }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="color: #64748b; font-style: italic; text-align: center; margin: 15px 0;">
+                A kazamata üres volt (nem tartalmazott kártyákat)
+            </p>
+        {% endif %}
+    </div>
+    
+    <div style="background: rgba(231, 76, 60, 0.2); padding: 20px; border-radius: 8px; border-left: 3px solid #e74c3c; margin-bottom: 30px;">
+        <p style="color: #ff6b6b; margin: 0; font-size: 16px; line-height: 1.6;">
+            <strong>⚠️ Figyelem!</strong><br>
+            Ez a művelet nem visszavonható! A kazamata és az összes benne lévő kártya kapcsolat véglegesen törlődik.
+            <br><br>
+            A játékkörnyezetekben található hivatkozások is el fognak tűnni!
+        </p>
+    </div>
+    
+    <form method="post" style="text-align: center;">
+        {% csrf_token %}
+        
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button type="submit" class="btn btn-danger" style="min-width: 180px;">
+                ✅ Igen, törlöm véglegesen
+            </button>
+            <a href="{% url 'damareen:manage_kazamatak' %}" class="btn btn-secondary" style="min-width: 180px;">
+                ❌ Mégse, visszalépek
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card" style="background: rgba(52, 152, 219, 0.1); border-left-color: #3498db; margin-top: 20px;">
+    <h3 style="color: #3498db;">💡 Alternatíva</h3>
+    <p style="color: #cbd5e0; margin: 0; line-height: 1.6;">
+        Ha csak módosítani szeretnéd a kazamatát (név, leírás, kártyák cseréje), használd inkább a szerkesztés funkciót!
+    </p>
+    <div style="margin-top: 15px;">
+        <a href="{% url 'damareen:edit_kazamata' kazamata.id %}" class="btn btn-primary">
+            ✏️ Inkább szerkesztem
+        </a>
+    </div>
+</div>
+{% endblock %}

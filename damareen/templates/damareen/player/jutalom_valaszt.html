@@ -1,0 +1,70 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Jutalom választása{% endblock %}
+
+{% block content %}
+<h2>🎁 Jutalom választása</h2>
+
+<div class="card">
+    <h3>Gratulálunk a győzelemhez!</h3>
+    <p><strong>{{ harc.kazamata.nev }}</strong> legyőzve!</p>
+    <p>Jutalom: <strong>{{ harc.kazamata.get_nyeremeny_leiras }}</strong></p>
+    
+    <p style="margin-top: 20px; color: #666;">
+        Válaszd ki, hogy melyik kártyádat szeretnéd fejleszteni:
+    </p>
+</div>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div class="grid">
+        {% for kartya in gyujtemeny %}
+        <div class="card">
+            <label style="cursor: pointer; display: block;">
+                <input type="radio" name="kartya_id" value="{{ kartya.id }}" required
+                       style="margin-right: 10px;">
+                
+                <div class="kartya kartya-{{ kartya.eredeti_kartya.tipus }}" 
+                     style="margin-top: 10px;">
+                    <h4>{{ kartya.eredeti_kartya.nev }}</h4>
+                    <div class="kartya-stat">
+                        <span>⚔️ Sebzés:</span>
+                        <span>{{ kartya.aktualis_sebzes }}
+                            {% if harc.kazamata.tipus == 'egyszeru' or harc.kazamata.tipus == 'nagy' %}
+                                → <strong style="color: #28a745;">
+                                    {% if harc.kazamata.tipus == 'egyszeru' %}
+                                        {{ kartya.aktualis_sebzes|add:1 }}
+                                    {% else %}
+                                        {{ kartya.aktualis_sebzes|add:3 }}
+                                    {% endif %}
+                                </strong>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="kartya-stat">
+                        <span>❤️ Életerő:</span>
+                        <span>{{ kartya.aktualis_eletero }}
+                            {% if harc.kazamata.tipus == 'kis' %}
+                                → <strong style="color: #28a745;">{{ kartya.aktualis_eletero|add:2 }}</strong>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <span class="elem-icon elem-{{ kartya.eredeti_kartya.tipus }}">
+                            {{ kartya.get_tipus_display }}
+                        </span>
+                    </div>
+                </div>
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div style="margin-top: 30px; text-align: center;">
+        <button type="submit" class="btn btn-success">
+            ✅ Jutalom átvétele
+        </button>
+    </div>
+</form>
+{% endblock %}

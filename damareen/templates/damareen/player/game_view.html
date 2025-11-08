@@ -1,0 +1,328 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}{{ jatek.kornyezet.nev }} - Játék{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    .auto-save-indicator {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: bold;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    
+    .auto-save-indicator.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .stat-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        margin: 0 4px;
+    }
+    
+    .btn-battle {
+        animation: pulse 2s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-battle::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    .btn-battle:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+<h2>🎮 {{ jatek.kornyezet.nev }}</h2>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+    <!-- Gyűjtemény -->
+    <div class="card fade-in">
+        <h3 style="color: #10b981;">📚 Gyűjteményem 
+            <span class="stat-badge" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+                {{ gyujtemeny.count }} 🎴
+            </span>
+        </h3>
+        
+        <div style="max-height: 500px; overflow-y: auto; padding-right: 5px;">
+            {% for kartya in gyujtemeny %}
+            <div class="kartya kartya-{{ kartya.eredeti_kartya.tipus }} fade-in" style="margin: 10px 0;">
+                <h4>{{ kartya.eredeti_kartya.nev }}</h4>
+                <div class="kartya-stat">
+                    <span>⚔️ Sebzés:</span>
+                    <span style="color: #ff6b6b;">{{ kartya.aktualis_sebzes }}</span>
+                </div>
+                <div class="kartya-stat">
+                    <span>❤️ Életerő:</span>
+                    <span style="color: #10b981;">{{ kartya.aktualis_eletero }}</span>
+                </div>
+                <div style="margin-top: 10px; text-align: center;">
+                    <span class="elem-icon elem-{{ kartya.eredeti_kartya.tipus }}">
+                        {{ kartya.get_tipus_display }}
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'damareen:pakli_osszeallit' jatek.id %}" class="btn btn-primary" style="width: 100%;">
+                🎴 Pakli összeállítása
+            </a>
+        </div>
+    </div>
+    
+    <!-- Aktuális pakli és harcok -->
+    <div class="fade-in" style="animation-delay: 0.1s;">
+        <!-- Aktuális pakli -->
+        <div class="card">
+            <h3 style="color: #daa520;">🎴 Aktuális pakli</h3>
+            
+            {% if pakli %}
+                <div style="background: rgba(218, 165, 32, 0.15); padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid #daa520;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #cbd5e0; font-size: 14px;">
+                            <strong style="color: #daa520;">{{ pakli.get_kartyak_szama }} 🎴</strong> kártya
+                        </span>
+                        <span style="color: #64748b; font-size: 12px;">
+                            🕐 {{ pakli.letrehozva|date:"Y.m.d H:i" }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+                    {% for pakli_kartya in pakli.kartyak.all %}
+                    <div style="padding: 10px; background: rgba(26, 26, 46, 0.6); margin: 8px 0; border-radius: 8px; border-left: 4px solid 
+                        {% if pakli_kartya.kartya.eredeti_kartya.tipus == 'tuz' %}#ff4757
+                        {% elif pakli_kartya.kartya.eredeti_kartya.tipus == 'fold' %}#8b4513
+                        {% elif pakli_kartya.kartya.eredeti_kartya.tipus == 'viz' %}#3498db
+                        {% else %}#1dd1a1{% endif %}; display: flex; justify-content: space-between; align-items: center;">
+                        
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(218, 165, 32, 0.3); color: #daa520; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                                #{{ pakli_kartya.sorrend }}
+                            </span>
+                            <span style="font-weight: bold; color: 
+                                {% if pakli_kartya.kartya.eredeti_kartya.tipus == 'tuz' %}#ff4757
+                                {% elif pakli_kartya.kartya.eredeti_kartya.tipus == 'fold' %}#8b4513
+                                {% elif pakli_kartya.kartya.eredeti_kartya.tipus == 'viz' %}#3498db
+                                {% else %}#1dd1a1{% endif %};">
+                                {{ pakli_kartya.kartya.eredeti_kartya.nev }}
+                            </span>
+                        </div>
+                        <div style="font-size: 12px; color: #94a3b8;">
+                            <span title="Sebzés">⚔️ {{ pakli_kartya.kartya.aktualis_sebzes }}</span>
+                            <span style="margin-left: 8px;" title="Életerő">❤️ {{ pakli_kartya.kartya.aktualis_eletero }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="background: rgba(100, 116, 139, 0.2); padding: 30px; border-radius: 8px; text-align: center; margin-top: 10px;">
+                    <p style="color: #64748b; font-size: 14px; margin-bottom: 15px;">
+                        🎴 Nincs összeállított pakli
+                    </p>
+                    <a href="{% url 'damareen:pakli_osszeallit' jatek.id %}" class="btn btn-primary">
+                        ➕ Pakli összeállítása
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Kazamaták -->
+        <div class="card" style="margin-top: 20px;">
+            <h3 style="color: #e74c3c;">🏰 Elérhető kazamaták</h3>
+            
+            {% for kazamata in kazamatak %}
+            <div style="background: rgba(26, 26, 46, 0.6); padding: 15px; border-radius: 12px; margin: 12px 0; border-left: 4px solid 
+                {% if kazamata.tipus == 'egyszeru' %}#9b59b6
+                {% elif kazamata.tipus == 'kis' %}#3498db
+                {% else %}#e74c3c{% endif %};">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="margin: 0; color: 
+                        {% if kazamata.tipus == 'egyszeru' %}#9b59b6
+                        {% elif kazamata.tipus == 'kis' %}#3498db
+                        {% else %}#e74c3c{% endif %};">
+                        {{ kazamata.nev }}
+                    </h4>
+                    <span style="background: linear-gradient(135deg, 
+                        {% if kazamata.tipus == 'egyszeru' %}#9b59b6 0%, #8e44ad 100%
+                        {% elif kazamata.tipus == 'kis' %}#3498db 0%, #2980b9 100%
+                        {% else %}#e74c3c 0%, #c0392b 100%{% endif %}); 
+                        color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                        {{ kazamata.get_tipus_display }}
+                    </span>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; padding: 10px; background: rgba(218, 165, 32, 0.1); border-radius: 6px;">
+                    <div>
+                        <div style="color: #64748b; font-size: 11px;">🎴 Kártyák</div>
+                        <div style="color: #daa520; font-weight: bold;">{{ kazamata.get_kartyak_szama }} db</div>
+                    </div>
+                    <div>
+                        <div style="color: #64748b; font-size: 11px;">🏆 Jutalom</div>
+                        <div style="color: #10b981; font-weight: bold; font-size: 12px;">{{ kazamata.get_nyeremeny_leiras }}</div>
+                    </div>
+                </div>
+                
+                {% if pakli %}
+                    {% if pakli.get_kartyak_szama == kazamata.get_kartyak_szama %}
+                        <a href="{% url 'damareen:harc_indit' jatek.id kazamata.id %}" 
+                           class="btn btn-danger btn-battle" style="width: 100%;">
+                            ⚔️ HARC INDÍTÁSA ⚔️
+                        </a>
+                    {% else %}
+                        <div style="background: rgba(231, 76, 60, 0.2); padding: 10px; border-radius: 6px; border-left: 3px solid #e74c3c; text-align: center;">
+                            <p style="color: #ff6b6b; margin: 0; font-size: 13px;">
+                                ⚠️ Pakli méret nem egyezik<br>
+                                <span style="font-size: 11px; color: #cbd5e0;">{{ pakli.get_kartyak_szama }} kártya ≠ {{ kazamata.get_kartyak_szama }} kártya</span>
+                            </p>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div style="background: rgba(231, 76, 60, 0.2); padding: 10px; border-radius: 6px; border-left: 3px solid #e74c3c; text-align: center;">
+                        <p style="color: #ff6b6b; margin: 0; font-size: 13px;">⚠️ Nincs pakli összeállítva</p>
+                    </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Utolsó harcok -->
+{% if utolso_harcok %}
+<div class="card fade-in" style="margin-top: 30px; animation-delay: 0.2s;">
+    <h3 style="color: #daa520;">📜 Utolsó harcok</h3>
+    
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: rgba(218, 165, 32, 0.2);">
+                    <th style="padding: 12px; text-align: left; color: #daa520; border-bottom: 2px solid rgba(218, 165, 32, 0.5);">🏰 Kazamata</th>
+                    <th style="padding: 12px; text-align: left; color: #daa520; border-bottom: 2px solid rgba(218, 165, 32, 0.5);">🕐 Időpont</th>
+                    <th style="padding: 12px; text-align: center; color: #daa520; border-bottom: 2px solid rgba(218, 165, 32, 0.5);">📊 Eredmény</th>
+                    <th style="padding: 12px; text-align: center; color: #daa520; border-bottom: 2px solid rgba(218, 165, 32, 0.5);">👁️ Részletek</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for harc in utolso_harcok %}
+                <tr style="border-bottom: 1px solid rgba(100, 116, 139, 0.3);">
+                    <td style="padding: 12px; color: #cbd5e0;">{{ harc.kazamata.nev }}</td>
+                    <td style="padding: 12px; color: #94a3b8; font-size: 13px;">{{ harc.inditas|date:"Y.m.d H:i" }}</td>
+                    <td style="padding: 12px; text-align: center;">
+                        {% if harc.jatekos_gyozott %}
+                            <span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 4px 12px; border-radius: 12px; font-weight: bold; font-size: 13px;">
+                                🎉 Győzelem
+                            </span>
+                        {% else %}
+                            <span style="background: rgba(231, 76, 60, 0.2); color: #ff6b6b; padding: 4px 12px; border-radius: 12px; font-weight: bold; font-size: 13px;">
+                                😞 Vereség
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 12px; text-align: center;">
+                        <a href="{% url 'damareen:harc_eredmeny' jatek.id harc.id %}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">
+                            👁️ Megtekintés
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div style="margin-top: 30px;">
+    <a href="{% url 'damareen:player_dashboard' %}" class="btn btn-secondary">
+        ← Vissza a műszerfalhoz
+    </a>
+</div>
+</div>
+
+<!-- Auto-save indicator -->
+<div class="auto-save-indicator" id="auto-save-indicator">
+    💾 Automatikus mentés...
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-save functionality
+    function autoSave() {
+        const indicator = document.getElementById('auto-save-indicator');
+        indicator.classList.add('show');
+        
+        // Simulate auto-save (in production, this would make an AJAX call)
+        fetch(`/player/jatek/{{ jatek.id }}/`, {
+            method: 'HEAD',
+            credentials: 'same-origin'
+        }).then(() => {
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        });
+    }
+    
+    // Auto-save every 30 seconds
+    setInterval(autoSave, 30000);
+    
+    // Auto-save on visibility change (when user switches tabs)
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            autoSave();
+        }
+    });
+    
+    // Auto-save before page unload
+    window.addEventListener('beforeunload', function() {
+        navigator.sendBeacon(`/player/jatek/{{ jatek.id }}/`);
+    });
+</script>
+{% endblock %}

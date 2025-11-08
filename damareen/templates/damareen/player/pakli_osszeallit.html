@@ -1,0 +1,83 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Pakli összeállítása{% endblock %}
+
+{% block content %}
+<h2>🎴 Pakli összeállítása</h2>
+
+<p>Válaszd ki a kártyákat a gyűjteményedből a paklidhoz. A sorrend számít!</p>
+
+<form method="post">
+    {% csrf_token %}
+    
+    <div class="grid">
+        {% for kartya in gyujtemeny %}
+        <div class="card">
+            <label style="cursor: pointer; display: block;">
+                <input type="checkbox" name="kartyak" value="{{ kartya.id }}" 
+                       style="margin-right: 10px;">
+                
+                <div class="kartya kartya-{{ kartya.eredeti_kartya.tipus }}" 
+                     style="margin-top: 10px;">
+                    <h4>{{ kartya.eredeti_kartya.nev }}</h4>
+                    <div class="kartya-stat">
+                        <span>⚔️ Sebzés:</span>
+                        <span>{{ kartya.aktualis_sebzes }}</span>
+                    </div>
+                    <div class="kartya-stat">
+                        <span>❤️ Életerő:</span>
+                        <span>{{ kartya.aktualis_eletero }}</span>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <span class="elem-icon elem-{{ kartya.eredeti_kartya.tipus }}">
+                            {{ kartya.get_tipus_display }}
+                        </span>
+                    </div>
+                </div>
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div style="margin-top: 30px; text-align: center;">
+        <button type="submit" class="btn btn-success">
+            ✅ Pakli mentése
+        </button>
+        <a href="{% url 'damareen:game_view' jatek.id %}" class="btn btn-secondary">
+            Mégse
+        </a>
+    </div>
+</form>
+
+<script>
+    // Sorrend kezelése
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    let order = 1;
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                const label = this.closest('label');
+                const orderSpan = document.createElement('span');
+                orderSpan.textContent = order;
+                orderSpan.style.cssText = 'position: absolute; top: 10px; left: 10px; background: #667eea; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;';
+                orderSpan.className = 'order-badge';
+                label.style.position = 'relative';
+                label.appendChild(orderSpan);
+                order++;
+            } else {
+                const orderBadge = this.closest('label').querySelector('.order-badge');
+                if (orderBadge) {
+                    orderBadge.remove();
+                }
+                // Újraszámozás
+                order = 1;
+                document.querySelectorAll('.order-badge').forEach(badge => {
+                    badge.textContent = order++;
+                });
+                order = document.querySelectorAll('.order-badge').length + 1;
+            }
+        });
+    });
+</script>
+{% endblock %}

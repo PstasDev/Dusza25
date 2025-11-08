@@ -1,0 +1,43 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Kártya törlése{% endblock %}
+
+{% block content %}
+<h2>🗑️ Világkártya törlése</h2>
+
+<div class="card" style="border-left-color: #e74c3c;">
+    <h3 style="color: #ff6b6b;">⚠️ Biztosan törölni szeretnéd?</h3>
+    
+    <div class="kartya kartya-{{ kartya.tipus }}" style="max-width: 300px; margin: 30px auto;">
+        <h3>{{ kartya.nev }}</h3>
+        <div class="kartya-stat">
+            <span>⚔️ Sebzés:</span>
+            <span style="color: #daa520;">{{ kartya.sebzes }}</span>
+        </div>
+        <div class="kartya-stat">
+            <span>❤️ Életerő:</span>
+            <span style="color: #e74c3c;">{{ kartya.eletero }}</span>
+        </div>
+        <div style="margin-top: 10px; text-align: center;">
+            <span class="elem-icon elem-{{ kartya.tipus }}">
+                {{ kartya.get_tipus_display }}
+            </span>
+        </div>
+    </div>
+    
+    <p style="color: #ff6b6b; text-align: center; font-size: 18px; margin: 20px 0;">
+        Ez a művelet nem visszavonható! A kártyát használó összes vezér, kazamata és játék is törlődni fog!
+    </p>
+    
+    <form method="post" style="text-align: center;">
+        {% csrf_token %}
+        
+        <button type="submit" class="btn btn-danger">
+            ✅ Igen, törlöm
+        </button>
+        <a href="{% url 'damareen:manage_vilagkartyak' %}" class="btn btn-secondary">
+            Mégse
+        </a>
+    </form>
+</div>
+{% endblock %}

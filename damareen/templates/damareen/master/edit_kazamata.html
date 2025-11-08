@@ -1,0 +1,214 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Kazamata szerkesztése{% endblock %}
+
+{% block content %}
+<h2>✏️ Kazamata szerkesztése: {{ kazamata.nev }}</h2>
+
+<div style="display: flex; gap: 30px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 400px;">
+        <div class="card">
+            <h3>📝 Alapadatok módosítása</h3>
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.nev.id_for_label }}">📛 Kazamata neve:</label>
+                    {{ form.nev }}
+                    {% if form.nev.errors %}
+                        <div style="color: #e74c3c; font-size: 14px; margin-top: 5px;">
+                            {{ form.nev.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.tipus.id_for_label }}">🏛️ Kazamata típusa:</label>
+                    {{ form.tipus }}
+                    {% if form.tipus.errors %}
+                        <div style="color: #e74c3c; font-size: 14px; margin-top: 5px;">
+                            {{ form.tipus.errors }}
+                        </div>
+                    {% endif %}
+                    <small style="color: #ff6b6b; display: block; margin-top: 5px; font-weight: bold;">
+                        ⚠️ Figyelem! A típus megváltoztatása törli az összes kártyát!
+                    </small>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    💾 Mentés
+                </button>
+            </form>
+        </div>
+        
+        <div class="card" style="margin-top: 20px;">
+            <h3>🃏 Kártyák kezelése</h3>
+            
+            <div style="background: rgba(218, 165, 32, 0.15); padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 3px solid #daa520;">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
+                    <div>
+                        <div style="color: #64748b; font-size: 12px;">Típus</div>
+                        <div style="color: #daa520; font-weight: bold; font-size: 16px;">
+                            {{ kazamata.get_tipus_display }}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="color: #64748b; font-size: 12px;">Bónusz</div>
+                        <div style="color: #daa520; font-weight: bold; font-size: 16px;">
+                            {% if kazamata.tipus == 'egyszeru' %}+1 ⚔️
+                            {% elif kazamata.tipus == 'kis' %}+2 ❤️
+                            {% else %}+3 ⚔️{% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <div style="color: #64748b; font-size: 12px;">Kapacitás</div>
+                        <div style="color: {% if kazamata.kartyak.count >= kazamata.max_normalis_kartyak|add:1 %}#10b981{% else %}#cbd5e0{% endif %}; font-weight: bold; font-size: 16px;">
+                            {{ kazamata.kartyak.count }} / {{ max_kartyak }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if kazamata.kartyak.exists %}
+                <h4 style="color: #daa520; margin-bottom: 15px;">Jelenlegi kártyák:</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    {% for kk in kazamata.kartyak.all %}
+                        <div style="background: rgba(26, 26, 46, 0.6); padding: 12px; border-radius: 8px; border-left: 4px solid 
+                            {% if kk.kartya.tipus == 'TUZ' %}#ff4757
+                            {% elif kk.kartya.tipus == 'FOLD' %}#8b4513
+                            {% elif kk.kartya.tipus == 'VIZ' %}#3498db
+                            {% else %}#1dd1a1{% endif %}; display: flex; justify-content: space-between; align-items: center;">
+                            
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                    <span style="background: rgba(218, 165, 32, 0.3); color: #daa520; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                                        #{{ kk.sorrend }}
+                                    </span>
+                                    <span style="font-weight: bold; font-size: 16px; color: 
+                                        {% if kk.kartya.tipus == 'TUZ' %}#ff4757
+                                        {% elif kk.kartya.tipus == 'FOLD' %}#8b4513
+                                        {% elif kk.kartya.tipus == 'VIZ' %}#3498db
+                                        {% else %}#1dd1a1{% endif %};">
+                                        {{ kk.kartya.nev }}
+                                    </span>
+                                    {% if kk.is_vezer %}
+                                        <span style="color: #daa520; font-size: 18px;" title="Vezérkártya">👑</span>
+                                    {% endif %}
+                                </div>
+                                <div style="font-size: 13px; color: #94a3b8;">
+                                    <span>⚔️ {{ kk.kartya.sebzes }}</span>
+                                    <span style="margin-left: 12px;">❤️ {{ kk.kartya.eletero }}</span>
+                                    <span style="margin-left: 12px;">{{ kk.kartya.get_tipus_display }}</span>
+                                </div>
+                            </div>
+                            
+                            <form method="post" action="{% url 'damareen:edit_kazamata' kazamata.id %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="remove_card" value="{{ kk.id }}">
+                                <button type="submit" class="btn btn-danger" style="padding: 6px 12px;">
+                                    ❌ Eltávolít
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="background: rgba(100, 116, 139, 0.2); padding: 30px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+                    <p style="color: #64748b; font-size: 14px; margin: 0;">
+                        🃏 Még nincsenek kártyák hozzáadva
+                    </p>
+                </div>
+            {% endif %}
+            
+            {% if can_add_normal %}
+                <h4 style="color: #10b981; margin-bottom: 15px;">➕ Új normál kártya hozzáadása:</h4>
+                <form method="post" action="{% url 'damareen:edit_kazamata' kazamata.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Válassz egy világkártyát:</label>
+                        <select name="add_normal_card" class="input-field" required>
+                            <option value="">-- Válassz kártyát --</option>
+                            {% for vk in vilag_kartyak %}
+                                <option value="{{ vk.id }}">
+                                    {{ vk.nev }} ({{ vk.get_tipus_display }} - ⚔️{{ vk.sebzes }} ❤️{{ vk.eletero }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        ➕ Normál kártya hozzáadása
+                    </button>
+                </form>
+            {% endif %}
+            
+            {% if can_add_leader %}
+                <h4 style="color: #daa520; margin-top: 25px; margin-bottom: 15px;">👑 Vezérkártya hozzáadása:</h4>
+                <form method="post" action="{% url 'damareen:edit_kazamata' kazamata.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Válassz egy vezérkártyát:</label>
+                        <select name="add_leader_card" class="input-field" required>
+                            <option value="">-- Válassz vezért --</option>
+                            {% for vez in vezer_kartyak %}
+                                <option value="{{ vez.id }}">
+                                    👑 {{ vez.nev }} ({{ vez.get_tipus_display }} - ⚔️{{ vez.sebzes }} ❤️{{ vez.eletero }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        ➕ Vezérkártya hozzáadása
+                    </button>
+                </form>
+            {% endif %}
+            
+            {% if not can_add_normal and not can_add_leader %}
+                <div style="background: rgba(16, 185, 129, 0.2); padding: 20px; border-radius: 8px; text-align: center; border-left: 3px solid #10b981;">
+                    <p style="color: #10b981; margin: 0; font-weight: bold;">
+                        ✅ A kazamata tele van! ({{ kazamata.kartyak.count }}/{{ max_kartyak }})
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div style="flex: 0 0 300px;">
+        <div class="card" style="background: rgba(218, 165, 32, 0.1); border-left-color: #daa520;">
+            <h3 style="color: #daa520;">ℹ️ Segítség</h3>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #cbd5e0; font-size: 14px; margin-bottom: 8px;">📌 Kártyák sorrendje</h4>
+                <p style="color: #94a3b8; font-size: 13px; line-height: 1.6;">
+                    A kártyák a hozzáadás sorrendjében szerepelnek a harcban. Az első kártya lesz az első ütközet.
+                </p>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #cbd5e0; font-size: 14px; margin-bottom: 8px;">👑 Vezérkártyák</h4>
+                <p style="color: #94a3b8; font-size: 13px; line-height: 1.6;">
+                    Kis és nagy kazamatákhoz pontosan 1 vezérkártya szükséges. A vezér dupla sebzéssel vagy életerővel rendelkezik.
+                </p>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #cbd5e0; font-size: 14px; margin-bottom: 8px;">⚠️ Típus változtatás</h4>
+                <p style="color: #94a3b8; font-size: 13px; line-height: 1.6;">
+                    Ha megváltoztatod a kazamata típusát, az összes hozzáadott kártya törlődni fog!
+                </p>
+            </div>
+            
+            <div style="background: rgba(52, 152, 219, 0.2); padding: 12px; border-radius: 8px; margin-top: 20px; border-left: 3px solid #3498db;">
+                <p style="color: #cbd5e0; margin: 0; font-size: 12px;">
+                    <strong>💡 Tipp:</strong> Stratégiailag érdemes változatos elemeket használni, hogy a játékos ne tudjon túl könnyedén győzni!
+                </p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'damareen:manage_kazamatak' %}" class="btn btn-secondary" style="width: 100%;">
+                ⬅️ Vissza a kazamatákhoz
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

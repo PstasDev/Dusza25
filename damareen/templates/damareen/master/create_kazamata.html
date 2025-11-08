@@ -1,0 +1,100 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Kazamata létrehozása{% endblock %}
+
+{% block content %}
+<h2>🏰 Új kazamata létrehozása</h2>
+
+<div style="display: flex; gap: 30px; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 350px;">
+        <div class="card">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.nev.id_for_label }}">📛 Kazamata neve:</label>
+                    {{ form.nev }}
+                    {% if form.nev.errors %}
+                        <div style="color: #e74c3c; font-size: 14px; margin-top: 5px;">
+                            {{ form.nev.errors }}
+                        </div>
+                    {% endif %}
+                    <small style="color: #64748b; display: block; margin-top: 5px;">
+                        Maximum 100 karakter. Legyen beszédes és emlékezetes!
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.tipus.id_for_label }}">🏛️ Kazamata típusa:</label>
+                    {{ form.tipus }}
+                    {% if form.tipus.errors %}
+                        <div style="color: #e74c3c; font-size: 14px; margin-top: 5px;">
+                            {{ form.tipus.errors }}
+                        </div>
+                    {% endif %}
+                    <small style="color: #64748b; display: block; margin-top: 5px;">
+                        A típus határozza meg a kártyák számát és a bónuszt
+                    </small>
+                </div>
+                
+                <div style="background: rgba(218, 165, 32, 0.15); padding: 15px; border-radius: 8px; border-left: 3px solid #daa520; margin-bottom: 20px;">
+                    <p style="color: #daa520; margin: 0; font-size: 14px;">
+                        ℹ️ <strong>Fontos:</strong> A kazamata létrehozása után a szerkesztés oldalon tudsz kártyákat hozzáadni!
+                    </p>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">
+                        ✅ Kazamata létrehozása
+                    </button>
+                    <a href="{% url 'damareen:manage_kazamatak' %}" class="btn btn-secondary">
+                        Mégse
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div style="flex: 1; min-width: 300px;">
+        <div class="card" style="background: rgba(218, 165, 32, 0.1); border-left-color: #daa520;">
+            <h3 style="color: #daa520;">💡 Tippek</h3>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #9b59b6; font-size: 16px; margin-bottom: 10px;">🏛️ Egyszerű kazamata</h4>
+                <ul style="color: #cbd5e0; font-size: 14px; line-height: 1.8;">
+                    <li><strong>Kapacitás:</strong> 1 normál kártya</li>
+                    <li><strong>Bónusz:</strong> +1 sebzés</li>
+                    <li><strong>Ajánlott:</strong> Kezdő játékosoknak</li>
+                    <li><strong>Példa név:</strong> "A rejtett kripta"</li>
+                </ul>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #3498db; font-size: 16px; margin-bottom: 10px;">🏰 Kis kazamata</h4>
+                <ul style="color: #cbd5e0; font-size: 14px; line-height: 1.8;">
+                    <li><strong>Kapacitás:</strong> 3 normál + 1 vezér</li>
+                    <li><strong>Bónusz:</strong> +2 életerő</li>
+                    <li><strong>Ajánlott:</strong> Haladóknak</li>
+                    <li><strong>Példa név:</strong> "Árnyak völgye"</li>
+                </ul>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #e74c3c; font-size: 16px; margin-bottom: 10px;">🏔️ Nagy kazamata</h4>
+                <ul style="color: #cbd5e0; font-size: 14px; line-height: 1.8;">
+                    <li><strong>Kapacitás:</strong> 5 normál + 1 vezér</li>
+                    <li><strong>Bónusz:</strong> +3 sebzés</li>
+                    <li><strong>Ajánlott:</strong> Tapasztalt játékosoknak</li>
+                    <li><strong>Példa név:</strong> "A sötét csúcs vára"</li>
+                </ul>
+            </div>
+            
+            <div style="background: rgba(52, 152, 219, 0.2); padding: 12px; border-radius: 8px; margin-top: 20px; border-left: 3px solid #3498db;">
+                <p style="color: #cbd5e0; margin: 0; font-size: 13px;">
+                    <strong>📌 Stratégiai tipp:</strong> A kis és nagy kazamatákhoz érdemes egy erős vezért választani, aki képes tartani a frontot!
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

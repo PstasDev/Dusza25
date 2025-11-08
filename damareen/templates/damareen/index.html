@@ -1,0 +1,203 @@
+{% extends 'damareen/base.html' %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        text-align: center;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(101, 67, 33, 0.3) 100%);
+        border-radius: 15px;
+        border: 2px solid rgba(218, 165, 32, 0.3);
+        margin-bottom: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+    
+    .hero-title {
+        font-family: 'Cinzel', serif;
+        font-size: 4em;
+        color: #daa520;
+        text-shadow: 
+            0 0 20px rgba(218, 165, 32, 0.8),
+            0 0 40px rgba(218, 165, 32, 0.5),
+            3px 3px 6px rgba(0,0,0,0.8);
+        margin-bottom: 20px;
+        letter-spacing: 6px;
+    }
+    
+    .hero-subtitle {
+        font-size: 24px;
+        color: #cbd5e0;
+        font-style: italic;
+        margin-bottom: 40px;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin: 40px 0;
+    }
+    
+    .feature-card {
+        background: linear-gradient(135deg, rgba(60, 60, 80, 0.5) 0%, rgba(40, 40, 60, 0.5) 100%);
+        padding: 30px;
+        border-radius: 12px;
+        border: 2px solid rgba(218, 165, 32, 0.3);
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: #daa520;
+        box-shadow: 0 8px 24px rgba(218, 165, 32, 0.3);
+    }
+    
+    .feature-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    
+    .rules-box {
+        background: linear-gradient(135deg, rgba(30, 30, 50, 0.6) 0%, rgba(20, 20, 40, 0.6) 100%);
+        padding: 40px;
+        border-radius: 15px;
+        border: 2px solid rgba(218, 165, 32, 0.4);
+        margin-top: 40px;
+    }
+    
+    .rules-box ul {
+        list-style: none;
+        padding-left: 0;
+    }
+    
+    .rules-box li {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(218, 165, 32, 0.2);
+        font-size: 18px;
+    }
+    
+    .rules-box li:last-child {
+        border-bottom: none;
+    }
+    
+    .cta-buttons {
+        margin-top: 40px;
+        text-align: center;
+    }
+    
+    .cta-buttons .btn {
+        margin: 10px;
+        font-size: 18px;
+        padding: 16px 32px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">DAMAREEN</h1>
+    <p class="hero-subtitle">A gyűjtögetős fantasy kártyajáték</p>
+    
+    <div class="cta-buttons">
+        {% if user.is_authenticated %}
+            <a href="{% url 'damareen:player_dashboard' %}" class="btn btn-success">
+                🎮 Játék indítása
+            </a>
+            <a href="{% url 'damareen:master_dashboard' %}" class="btn">
+                🎲 Játékmester mód
+            </a>
+        {% else %}
+            <a href="{% url 'damareen:login' %}" class="btn btn-success">
+                🔑 Bejelentkezés
+            </a>
+            <a href="{% url 'damareen:register' %}" class="btn">
+                📝 Regisztráció
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div style="margin: 40px auto; max-width: 1000px;">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="font-size: 2.5em;">Üdvözlünk a Damareen világában!</h2>
+        <p style="font-size: 20px; line-height: 1.8; margin-top: 20px;">
+            Stratégia, szerencse és képzelet találkozása. Fejleszd kártyáidat, 
+            küzdj meg kazamatákban, és váljél legendává!
+        </p>
+    </div>
+    
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🎮</div>
+            <h3>Játékosként</h3>
+            <p style="line-height: 1.8;">
+                Válassz egy játékkörnyezetet, állítsd össze a paklidat, és indulj harcba 
+                a kazamaták ellen! Minden győzelemért jutalmat kapsz, amivel tovább 
+                fejlesztheted kártyáidat.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🎲</div>
+            <h3>Játékmesterként</h3>
+            <p style="line-height: 1.8;">
+                Hozz létre saját világokat! Definiálj világkártyákat, vezéreket és 
+                kazamatákat. Állítsd össze a kezdő gyűjteményt, és engedd játszani 
+                a játékosokat!
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="rules-box">
+    <h3 style="text-align: center; font-size: 2em; margin-bottom: 30px;">
+        ⚔️ Játék szabályok
+    </h3>
+    <ul>
+        <li>
+            🃏 Minden kártyának van <strong style="color: #daa520;">sebzés</strong>, 
+            <strong style="color: #daa520;">életerő</strong> és 
+            <strong style="color: #daa520;">típus</strong> értéke
+        </li>
+        <li>
+            ⚔️ Kártyák ütközete: Sebzés vs Életerő, majd típus előny dönt
+        </li>
+        <li>
+            <span style="display: inline-flex; gap: 10px; align-items: center;">
+                🔥 Típus előnyök: 
+                <span class="elem-icon elem-tuz" style="font-size: 11px; padding: 4px 8px;">TŰZ</span> → 
+                <span class="elem-icon elem-fold" style="font-size: 11px; padding: 4px 8px;">FÖLD</span> → 
+                <span class="elem-icon elem-viz" style="font-size: 11px; padding: 4px 8px;">VÍZ</span> → 
+                <span class="elem-icon elem-levego" style="font-size: 11px; padding: 4px 8px;">LEVEGŐ</span> → 
+                <span class="elem-icon elem-tuz" style="font-size: 11px; padding: 4px 8px;">TŰZ</span>
+            </span>
+        </li>
+        <li>
+            🏆 Legalább annyi győzelemmel kell rendelkezned, amennyi a kazamata kártyáinak száma
+        </li>
+        <li>
+            💎 Győzelem esetén fejlesztheted egyik kártyádat
+        </li>
+        <li>
+            📈 Kazamata típusok: 
+            <strong style="color: #90ee90;">Egyszerű (+1 sebzés)</strong>, 
+            <strong style="color: #64b5f6;">Kis (+2 életerő)</strong>, 
+            <strong style="color: #daa520;">Nagy (+3 sebzés)</strong>
+        </li>
+    </ul>
+</div>
+
+<div style="margin-top: 60px; text-align: center; padding: 40px; background: linear-gradient(135deg, rgba(139, 69, 19, 0.2) 0%, rgba(101, 67, 33, 0.2) 100%); border-radius: 15px; border: 2px solid rgba(218, 165, 32, 0.3);">
+    <h3 style="font-size: 2em; margin-bottom: 20px;">Készen állsz a kalandra?</h3>
+    <p style="font-size: 18px; margin-bottom: 30px;">
+        Lépj be a Damareen világába és szerezd meg az uralmat a kártyák felett!
+    </p>
+    
+    {% if not user.is_authenticated %}
+        <a href="{% url 'damareen:register' %}" class="btn btn-success" style="font-size: 20px; padding: 18px 36px;">
+            ⚔️ Csatlakozz most!
+        </a>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Világkártyák kezelése{% endblock %}
+
+{% block content %}
+<h2>🃏 Világkártyák kezelése</h2>
+
+<div style="margin-bottom: 30px;">
+    <a href="{% url 'damareen:create_vilagkartya' %}" class="btn btn-success">
+        ➕ Új világkártya létrehozása
+    </a>
+    <a href="{% url 'damareen:master_dashboard' %}" class="btn btn-secondary">
+        ← Vissza a műszerfalhoz
+    </a>
+</div>
+
+{% if kartyak %}
+    <div class="grid">
+        {% for kartya in kartyak %}
+        <div class="card">
+            <div class="kartya kartya-{{ kartya.tipus }}">
+                <h3>{{ kartya.nev }}</h3>
+                <div class="kartya-stat">
+                    <span>⚔️ Sebzés:</span>
+                    <span style="color: #daa520;">{{ kartya.sebzes }}</span>
+                </div>
+                <div class="kartya-stat">
+                    <span>❤️ Életerő:</span>
+                    <span style="color: #e74c3c;">{{ kartya.eletero }}</span>
+                </div>
+                <div style="margin-top: 10px; text-align: center;">
+                    <span class="elem-icon elem-{{ kartya.tipus }}">
+                        {{ kartya.get_tipus_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                <a href="{% url 'damareen:edit_vilagkartya' kartya.id %}" class="btn">
+                    ✏️ Szerkesztés
+                </a>
+                <a href="{% url 'damareen:delete_vilagkartya' kartya.id %}" class="btn btn-danger">
+                    🗑️ Törlés
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 40px;">
+        <p style="font-size: 18px; color: #cbd5e0;">
+            Még nincsenek világkártyák. Hozz létre egyet!
+        </p>
+        <div style="margin-top: 20px;">
+            <a href="{% url 'damareen:create_vilagkartya' %}" class="btn btn-success">
+                ➕ Első világkártya létrehozása
+            </a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

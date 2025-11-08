@@ -1,0 +1,129 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Új vezérkártya{% endblock %}
+
+{% block content %}
+<h2>➕ Új vezérkártya létrehozása</h2>
+
+<div class="card">
+    <p style="font-size: 18px; margin-bottom: 20px; color: #cbd5e0;">
+        A vezérkártyák a világkártyákból származtatott, erősebb változatok. 
+        Választhatsz, hogy a sebzés vagy az életerő értéke legyen duplázva.
+    </p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="nev">Vezér neve: *</label>
+            <input type="text" id="nev" name="nev" required maxlength="16"
+                   placeholder="pl. Darth Vader, King Arthur">
+            <small style="color: #cbd5e0; display: block; margin-top: 5px;">
+                Egyedi névnek kell lennie! Max. 16 karakter.
+            </small>
+        </div>
+        
+        <div class="form-group">
+            <label for="eredeti_kartya">Eredeti világkártya: *</label>
+            <select id="eredeti_kartya" name="eredeti_kartya" required onchange="updatePreview()">
+                <option value="">Válassz egy kártyát...</option>
+                {% for kartya in vilag_kartyak %}
+                <option value="{{ kartya.id }}" 
+                        data-sebzes="{{ kartya.sebzes }}"
+                        data-eletero="{{ kartya.eletero }}"
+                        data-tipus="{{ kartya.tipus }}"
+                        data-tipus-display="{{ kartya.get_tipus_display }}">
+                    {{ kartya.nev }} (S:{{ kartya.sebzes }}, É:{{ kartya.eletero }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="duplazas_tipusa">Duplázás típusa: *</label>
+            <select id="duplazas_tipusa" name="duplazas_tipusa" required onchange="updatePreview()">
+                {% for value, label in duplazas_choices %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div id="preview" style="margin-top: 30px; padding: 20px; background: rgba(20, 20, 40, 0.4); border-radius: 10px; display: none;">
+            <h3 style="text-align: center; margin-bottom: 20px;">Előnézet</h3>
+            <div class="kartya" id="preview-card" style="max-width: 300px; margin: 0 auto;">
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <span style="background: linear-gradient(135deg, #daa520 0%, #ffd700 100%); color: #1a1a2e; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                        👑 VEZÉR
+                    </span>
+                </div>
+                <h3 id="preview-nev">-</h3>
+                <p style="font-size: 14px; color: #cbd5e0; text-align: center; margin-bottom: 10px;">
+                    Származik: <span id="preview-eredeti">-</span>
+                </p>
+                <div class="kartya-stat">
+                    <span>⚔️ Sebzés:</span>
+                    <span style="color: #daa520;" id="preview-sebzes">-</span>
+                </div>
+                <div class="kartya-stat">
+                    <span>❤️ Életerő:</span>
+                    <span style="color: #e74c3c;" id="preview-eletero">-</span>
+                </div>
+                <div style="margin-top: 10px; text-align: center;">
+                    <span class="elem-icon" id="preview-tipus">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn btn-success">
+                ✅ Vezérkártya létrehozása
+            </button>
+            <a href="{% url 'damareen:manage_vezerkartyak' %}" class="btn btn-secondary">
+                Mégse
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+function updatePreview() {
+    const nevInput = document.getElementById('nev');
+    const kartyaSelect = document.getElementById('eredeti_kartya');
+    const duplazasSelect = document.getElementById('duplazas_tipusa');
+    const preview = document.getElementById('preview');
+    
+    const selectedOption = kartyaSelect.options[kartyaSelect.selectedIndex];
+    
+    if (!selectedOption.value) {
+        preview.style.display = 'none';
+        return;
+    }
+    
+    preview.style.display = 'block';
+    
+    const sebzes = parseInt(selectedOption.dataset.sebzes);
+    const eletero = parseInt(selectedOption.dataset.eletero);
+    const tipus = selectedOption.dataset.tipus;
+    const tipusDisplay = selectedOption.dataset.tipusDisplay;
+    const duplazas = duplazasSelect.value;
+    
+    const ujSebzes = duplazas === 'sebzes' ? sebzes * 2 : sebzes;
+    const ujEletero = duplazas === 'eletero' ? eletero * 2 : eletero;
+    
+    document.getElementById('preview-nev').textContent = nevInput.value || '(Név)';
+    document.getElementById('preview-eredeti').textContent = selectedOption.text.split(' (')[0];
+    document.getElementById('preview-sebzes').textContent = ujSebzes;
+    document.getElementById('preview-eletero').textContent = ujEletero;
+    
+    const tipusIcon = document.getElementById('preview-tipus');
+    tipusIcon.textContent = tipusDisplay;
+    tipusIcon.className = `elem-icon elem-${tipus}`;
+    
+    const card = document.getElementById('preview-card');
+    card.className = `kartya kartya-${tipus}`;
+    card.style.borderWidth = '4px';
+}
+
+document.getElementById('nev').addEventListener('input', updatePreview);
+</script>
+{% endblock %}

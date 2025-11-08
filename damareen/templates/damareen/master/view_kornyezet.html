@@ -1,0 +1,163 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}{{ kornyezet.nev }} - Szerkesztés{% endblock %}
+
+{% block content %}
+<h2>⚙️ {{ kornyezet.nev }}</h2>
+
+<div class="card">
+    <h3>📚 Kezdő gyűjtemény beállítása</h3>
+    
+    <p>Válaszd ki, hogy mely kártyák legyenek a játékosok kezdő gyűjteményében:</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="grid" style="margin-top: 20px;">
+            {% for kartya in vilag_kartyak %}
+            <div class="card">
+                <label style="cursor: pointer; display: block;">
+                    <input type="checkbox" name="kartyak" value="{{ kartya.id }}"
+                           {% for gyujtemeny_kartya in kezdo_gyujtemeny %}
+                               {% if gyujtemeny_kartya.kartya.id == kartya.id %}checked{% endif %}
+                           {% endfor %}
+                           style="margin-right: 10px;">
+                    
+                    <div class="kartya kartya-{{ kartya.tipus }}" style="margin-top: 10px;">
+                        <h4>{{ kartya.nev }}</h4>
+                        <div class="kartya-stat">
+                            <span>⚔️ Sebzés:</span>
+                            <span>{{ kartya.sebzes }}</span>
+                        </div>
+                        <div class="kartya-stat">
+                            <span>❤️ Életerő:</span>
+                            <span>{{ kartya.eletero }}</span>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <span class="elem-icon elem-{{ kartya.tipus }}">
+                                {{ kartya.get_tipus_display }}
+                            </span>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn btn-success">
+                ✅ Gyűjtemény mentése
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="card" style="margin-top: 30px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin: 0;">🏰 Elérhető kazamaták</h3>
+        <a href="{% url 'damareen:manage_kazamatak' %}" class="btn btn-primary">
+            ⚙️ Kazamaták kezelése
+        </a>
+    </div>
+    
+    <p style="color: #cbd5e0; margin-bottom: 20px; font-size: 14px;">
+        Itt láthatod az összes elérhető kazamatát. A kazamaták kezelése gombbal tudsz újakat létrehozni, szerkeszteni vagy törölni.
+    </p>
+    
+    {% if kazamatak %}
+        {% for kazamata in kazamatak %}
+        <div style="background: rgba(26, 26, 46, 0.6); padding: 20px; border-radius: 12px; margin: 15px 0; border-left: 4px solid 
+            {% if kazamata.tipus == 'egyszeru' %}#9b59b6
+            {% elif kazamata.tipus == 'kis' %}#3498db
+            {% else %}#e74c3c{% endif %};">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h4 style="margin: 0; color: 
+                    {% if kazamata.tipus == 'egyszeru' %}#9b59b6
+                    {% elif kazamata.tipus == 'kis' %}#3498db
+                    {% else %}#e74c3c{% endif %};">
+                    🏰 {{ kazamata.nev }}
+                </h4>
+                <span style="background: linear-gradient(135deg, 
+                    {% if kazamata.tipus == 'egyszeru' %}#9b59b6 0%, #8e44ad 100%
+                    {% elif kazamata.tipus == 'kis' %}#3498db 0%, #2980b9 100%
+                    {% else %}#e74c3c 0%, #c0392b 100%{% endif %}); 
+                    color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+                    {{ kazamata.get_tipus_display }}
+                </span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; padding: 12px; background: rgba(218, 165, 32, 0.1); border-radius: 8px;">
+                <div style="text-align: center;">
+                    <div style="color: #64748b; font-size: 11px;">Kártyák</div>
+                    <div style="color: #daa520; font-weight: bold;">{{ kazamata.kartyak.count }}</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="color: #64748b; font-size: 11px;">Kapacitás</div>
+                    <div style="color: #cbd5e0; font-weight: bold;">{{ kazamata.get_kartyak_szama }}</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="color: #64748b; font-size: 11px;">Jutalom</div>
+                    <div style="color: #10b981; font-weight: bold; font-size: 13px;">{{ kazamata.get_nyeremeny_leiras }}</div>
+                </div>
+            </div>
+            
+            {% if kazamata.kartyak.exists %}
+                <div style="margin-top: 15px;">
+                    <h5 style="color: #daa520; margin-bottom: 10px; font-size: 14px;">🃏 Kártyák sorrendben:</h5>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        {% for kk in kazamata.kartyak.all %}
+                        <div style="background: rgba(26, 26, 46, 0.8); padding: 8px 12px; border-radius: 6px; border-left: 3px solid 
+                            {% if kk.kartya.tipus == 'tuz' %}#ff4757
+                            {% elif kk.kartya.tipus == 'fold' %}#8b4513
+                            {% elif kk.kartya.tipus == 'viz' %}#3498db
+                            {% else %}#1dd1a1{% endif %}; display: flex; justify-content: space-between; align-items: center;">
+                            
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="background: rgba(218, 165, 32, 0.3); color: #daa520; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold;">
+                                    #{{ kk.sorrend }}
+                                </span>
+                                <span style="font-weight: bold; color: 
+                                    {% if kk.kartya.tipus == 'tuz' %}#ff4757
+                                    {% elif kk.kartya.tipus == 'fold' %}#8b4513
+                                    {% elif kk.kartya.tipus == 'viz' %}#3498db
+                                    {% else %}#1dd1a1{% endif %};">
+                                    {{ kk.kartya.nev }}
+                                </span>
+                                {% if kk.is_vezer %}
+                                    <span style="color: #daa520; font-size: 14px;" title="Vezérkártya">👑</span>
+                                {% endif %}
+                            </div>
+                            <div style="font-size: 12px; color: #94a3b8;">
+                                <span title="Sebzés">⚔️ {{ kk.kartya.sebzes }}</span>
+                                <span style="margin-left: 10px;" title="Életerő">❤️ {{ kk.kartya.eletero }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <p style="color: #64748b; font-style: italic; text-align: center; margin: 10px 0; font-size: 13px;">
+                    🃏 A kazamata még üres (nincsenek kártyák)
+                </p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div style="background: rgba(100, 116, 139, 0.2); padding: 40px; border-radius: 8px; text-align: center;">
+            <p style="color: #64748b; font-size: 16px; margin-bottom: 15px;">
+                🏰 Még nincsenek kazamaták az adatbázisban.
+            </p>
+            <a href="{% url 'damareen:manage_kazamatak' %}" class="btn btn-primary">
+                ➕ Hozd létre az első kazamatát!
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div style="margin-top: 30px;">
+    <a href="{% url 'damareen:master_dashboard' %}" class="btn btn-secondary">
+        ⬅️ Vissza a főoldalra
+    </a>
+</div>
+{% endblock %}

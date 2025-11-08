@@ -1,0 +1,28 @@
+{% extends 'damareen/base.html' %}
+
+{% block title %}Bejelentkezés - Damareen{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto;">
+    <h2>🔑 Bejelentkezés</h2>
+    
+    <form method="post" style="margin-top: 30px;">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="username">Felhasználónév:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Jelszó:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <button type="submit" class="btn btn-success">Bejelentkezés</button>
+        <a href="{% url 'damareen:register' %}" class="btn btn-secondary" style="margin-left: 10px;">
+            Regisztráció
+        </a>
+    </form>
+</div>
+{% endblock %}
