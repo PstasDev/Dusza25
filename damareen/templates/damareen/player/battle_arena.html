@@ -18,6 +18,7 @@
         body {
             font-family: 'Crimson Text', serif;
             background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background-attachment: fixed;
             color: #e0e0e0;
             overflow: hidden;
             height: 100vh;
@@ -1012,6 +1013,642 @@
         .auto-save-indicator.show {
             opacity: 1;
             transform: translateY(0);
+        }
+        
+        /* ============================================
+           MOBILE RESPONSIVE STYLES
+           ============================================ */
+        
+        /* Tablet and smaller (max-width: 1024px) */
+        @media screen and (max-width: 1024px) {
+            .battle-container {
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .top-bar {
+                padding: 12px 20px;
+            }
+            
+            .kazamata-title {
+                font-size: 20px;
+                letter-spacing: 1px;
+            }
+            
+            .kazamata-title::before {
+                font-size: 22px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            .score-display {
+                font-size: 1.8em;
+                padding: 12px 30px;
+            }
+            
+            .round-info {
+                font-size: 16px;
+                padding: 8px 20px;
+            }
+            
+            .card-slot-title {
+                font-size: 16px;
+            }
+            
+            .battle-vs {
+                font-size: 50px;
+            }
+        }
+        
+        /* Mobile devices (max-width: 768px) */
+        @media screen and (max-width: 768px) {
+            html {
+                background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+                height: 100%;
+                overflow: hidden;
+            }
+            
+            body {
+                font-size: 14px;
+                overflow: hidden;
+                width: 100%;
+                height: 100vh;
+                background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+                background-attachment: fixed;
+            }
+            
+            .battle-container {
+                padding: 6px;
+                gap: 4px;
+                overflow: hidden;
+                height: 100vh;
+                max-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .top-bar {
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 6px 8px;
+                gap: 4px;
+                align-items: center;
+                flex-shrink: 0;
+                min-height: 0;
+            }
+            
+            .kazamata-title {
+                font-size: 13px;
+                text-align: left;
+                justify-content: flex-start;
+                flex: 1 1 100%;
+                gap: 4px;
+            }
+            
+            .kazamata-title::before {
+                font-size: 15px;
+            }
+            
+            .top-actions {
+                flex-direction: row;
+                gap: 6px;
+                width: 100%;
+                flex: 1 1 100%;
+            }
+            
+            .btn {
+                flex: 1;
+                padding: 8px 10px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            
+            .battle-info {
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 4px 8px;
+                gap: 4px;
+                align-items: center;
+                justify-content: space-between;
+                flex-shrink: 0;
+                min-height: 0;
+            }
+            
+            .score-display {
+                font-size: 1.1em;
+                padding: 4px 10px;
+                gap: 6px;
+                flex: 0 0 auto;
+            }
+            
+            .round-info {
+                font-size: 11px;
+                padding: 4px 8px;
+                flex: 0 0 auto;
+            }
+            
+            .status-message {
+                font-size: 10px;
+                padding: 3px 8px;
+                flex: 1 1 100%;
+                justify-content: center;
+                text-align: center;
+            }
+            
+            .battle-field {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                padding: 4px;
+                flex: 1;
+                justify-content: space-around;
+                align-items: center;
+                overflow: hidden;
+                min-height: 0;
+            }
+            
+            .card-slot {
+                max-width: 100%;
+                width: 100%;
+                flex: 0 0 auto;
+                min-height: 0;
+            }
+            
+            .card-slot.player {
+                order: 1;
+            }
+            
+            .battle-vs {
+                order: 2;
+                font-size: 18px;
+                margin: 2px 0;
+                flex: 0 0 auto;
+            }
+            
+            .card-slot.enemy {
+                order: 3;
+            }
+            
+            .card-slot-title {
+                font-size: 11px;
+                margin-bottom: 2px;
+                font-weight: 600;
+            }
+            
+            .card-container {
+                max-width: 200px;
+                width: 95%;
+                margin: 0 auto;
+                aspect-ratio: 2.5 / 3.5;
+                max-height: 28vh;
+            }
+            
+            .kartya {
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+            
+            .kartya h3 {
+                font-size: 13px;
+                margin-bottom: 4px;
+            }
+            
+            .kartya-header {
+                padding-bottom: 4px;
+                margin-bottom: 6px;
+                flex-shrink: 0;
+            }
+            
+            .kartya-type-icon {
+                font-size: 20px;
+                margin: 3px 0;
+            }
+            
+            .kartya-stats {
+                gap: 4px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .kartya-stat {
+                padding: 4px 6px;
+                font-size: 11px;
+            }
+            
+            .kartya-stat-label {
+                font-size: 9px;
+            }
+            
+            .kartya-stat-value {
+                font-size: 14px;
+            }
+            
+            .kartya-footer {
+                padding-top: 4px;
+                margin-top: 4px;
+                flex-shrink: 0;
+            }
+            
+            .kartya-element-label {
+                font-size: 9px;
+            }
+            
+            .kartya::before {
+                font-size: 45px;
+            }
+            
+            .card-back {
+                padding: 8px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+            }
+            
+            .card-back::before {
+                font-size: 35px;
+            }
+            
+            .card-back-logo {
+                font-size: 28px;
+                margin-bottom: 6px;
+            }
+            
+            .card-back-text {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+            
+            .final-result {
+                font-size: 18px;
+                padding: 16px 24px;
+                border-radius: 10px;
+                max-width: 85%;
+                letter-spacing: 1px;
+            }
+            
+            .auto-save-indicator {
+                bottom: 8px;
+                right: 8px;
+                font-size: 10px;
+                padding: 5px 10px;
+            }
+            
+            .death-skull,
+            .confetti-emoji {
+                font-size: 40px;
+            }
+            
+            .round-result-banner {
+                font-size: 14px;
+                padding: 5px 14px;
+                letter-spacing: 1px;
+            }
+        }
+        
+        /* Small mobile devices (max-width: 480px) */
+        @media screen and (max-width: 480px) {
+            .battle-container {
+                padding: 4px;
+                gap: 4px;
+            }
+            
+            .top-bar {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+            
+            .kazamata-title {
+                font-size: 14px;
+                letter-spacing: 0.5px;
+                gap: 5px;
+            }
+            
+            .kazamata-title::before {
+                font-size: 16px;
+            }
+            
+            .top-actions {
+                gap: 6px;
+            }
+            
+            .btn {
+                padding: 9px 10px;
+                font-size: 12px;
+                letter-spacing: 0.3px;
+            }
+            
+            .battle-info {
+                padding: 6px 8px;
+                gap: 6px;
+            }
+            
+            .score-display {
+                font-size: 1.1em;
+                padding: 5px 14px;
+                gap: 8px;
+                border-radius: 20px;
+            }
+            
+            .round-info {
+                font-size: 11px;
+                padding: 5px 10px;
+            }
+            
+            .status-message {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+            
+            .loading-spinner {
+                width: 12px;
+                height: 12px;
+                border-width: 2px;
+            }
+            
+            .battle-field {
+                gap: 8px;
+                padding: 3px;
+            }
+            
+            .battle-vs {
+                font-size: 28px;
+                margin: 3px 0;
+            }
+            
+            .card-slot-title {
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+            
+            .card-container {
+                max-width: 250px;
+            }
+            
+            .kartya {
+                padding: 10px;
+                border-radius: 10px;
+            }
+            
+            .kartya h3 {
+                font-size: 14px;
+            }
+            
+            .kartya-header {
+                padding-bottom: 6px;
+                margin-bottom: 8px;
+                border-bottom-width: 2px;
+            }
+            
+            .kartya-type-icon {
+                font-size: 24px;
+                margin: 4px 0;
+            }
+            
+            .kartya-stats {
+                gap: 5px;
+            }
+            
+            .kartya-stat {
+                padding: 5px 8px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+            
+            .kartya-stat-label {
+                font-size: 11px;
+                gap: 4px;
+            }
+            
+            .kartya-stat-value {
+                font-size: 16px;
+            }
+            
+            .kartya-footer {
+                padding-top: 6px;
+                margin-top: 6px;
+                border-top-width: 2px;
+            }
+            
+            .kartya-element-label {
+                font-size: 10px;
+                letter-spacing: 1px;
+            }
+            
+            .kartya::before {
+                font-size: 80px;
+            }
+            
+            .card-back {
+                padding: 10px;
+                border-width: 4px;
+            }
+            
+            .card-back::before {
+                font-size: 65px;
+            }
+            
+            .card-back::after {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                border-width: 3px;
+            }
+            
+            .card-back-logo {
+                font-size: 40px;
+                margin-bottom: 8px;
+            }
+            
+            .card-back-text {
+                font-size: 14px;
+                letter-spacing: 1.2px;
+            }
+            
+            .final-result {
+                font-size: 22px;
+                padding: 24px 32px;
+                letter-spacing: 1.5px;
+                border-radius: 14px;
+            }
+            
+            .death-skull,
+            .confetti-emoji {
+                font-size: 50px;
+            }
+            
+            .round-result-banner {
+                font-size: 16px;
+                padding: 8px 20px;
+                letter-spacing: 1.5px;
+                border-radius: 12px;
+                border-width: 4px;
+            }
+            
+            .auto-save-indicator {
+                bottom: 10px;
+                right: 10px;
+                font-size: 10px;
+                padding: 6px 12px;
+                border-radius: 8px;
+            }
+        }
+        
+        /* Landscape mobile orientation */
+        @media screen and (max-height: 500px) and (orientation: landscape) {
+            .battle-container {
+                padding: 4px;
+                gap: 4px;
+                overflow-y: auto;
+            }
+            
+            .top-bar {
+                padding: 6px 12px;
+                gap: 6px;
+            }
+            
+            .kazamata-title {
+                font-size: 13px;
+                flex: 0 0 auto;
+            }
+            
+            .kazamata-title::before {
+                font-size: 14px;
+            }
+            
+            .top-actions {
+                flex: 0 0 auto;
+            }
+            
+            .btn {
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            
+            .battle-info {
+                padding: 5px 10px;
+                gap: 6px;
+            }
+            
+            .score-display {
+                font-size: 1em;
+                padding: 4px 12px;
+                gap: 8px;
+            }
+            
+            .round-info {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            
+            .status-message {
+                font-size: 9px;
+                padding: 3px 8px;
+            }
+            
+            .battle-field {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                align-items: center;
+                justify-content: center;
+                padding: 4px;
+            }
+            
+            .card-slot {
+                flex: 0 0 auto;
+                max-width: 180px;
+            }
+            
+            .card-slot.player {
+                order: 1;
+            }
+            
+            .battle-vs {
+                order: 2;
+                font-size: 24px;
+                margin: 0 4px;
+            }
+            
+            .card-slot.enemy {
+                order: 3;
+            }
+            
+            .card-container {
+                max-width: 180px;
+            }
+            
+            .card-slot-title {
+                font-size: 10px;
+                margin-bottom: 4px;
+            }
+            
+            .kartya {
+                padding: 8px;
+            }
+            
+            .kartya h3 {
+                font-size: 12px;
+            }
+            
+            .kartya-type-icon {
+                font-size: 20px;
+                margin: 3px 0;
+            }
+            
+            .kartya-stat {
+                padding: 4px 6px;
+                font-size: 10px;
+            }
+            
+            .kartya-stat-value {
+                font-size: 13px;
+            }
+            
+            .kartya::before {
+                font-size: 60px;
+            }
+            
+            .card-back {
+                padding: 8px;
+            }
+            
+            .card-back::before {
+                font-size: 50px;
+            }
+            
+            .card-back-logo {
+                font-size: 30px;
+            }
+            
+            .card-back-text {
+                font-size: 11px;
+            }
+            
+            .final-result {
+                font-size: 20px;
+                padding: 20px 30px;
+            }
+        }
+        
+        /* Touch-friendly adjustments */
+        @media (hover: none) and (pointer: coarse) {
+            .btn {
+                min-height: 44px; /* iOS minimum touch target */
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+            }
         }
     </style>
 </head>

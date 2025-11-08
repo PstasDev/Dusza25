@@ -154,6 +154,136 @@
         font-size: 2em;
         margin-right: 10px;
     }
+    
+    /* ============================================
+       MOBILE RESPONSIVE STYLES
+       ============================================ */
+    
+    /* Mobile devices (max-width: 768px) */
+    @media screen and (max-width: 768px) {
+        .leaderboard-container {
+            padding: 0 10px;
+        }
+        
+        .leaderboard-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        
+        .my-rank-card {
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .my-rank-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        
+        .my-rank-number {
+            font-size: 2.5em;
+        }
+        
+        .stat-badge {
+            font-size: 10px;
+            padding: 3px 7px;
+            margin: 2px;
+        }
+        
+        .leaderboard-table {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .leaderboard-table table {
+            font-size: 12px;
+            min-width: 600px;
+        }
+        
+        .leaderboard-table th {
+            padding: 12px 8px;
+            font-size: 0.9em;
+        }
+        
+        .leaderboard-table td {
+            padding: 12px 8px;
+            font-size: 0.95em;
+        }
+        
+        .rank-cell {
+            font-size: 1.1em;
+        }
+        
+        .medal {
+            font-size: 1.5em;
+            margin-right: 5px;
+        }
+        
+        .points-badge {
+            font-size: 1em;
+        }
+        
+        .win-rate {
+            font-size: 0.9em;
+            padding: 3px 7px;
+        }
+    }
+    
+    /* Small mobile devices (max-width: 480px) */
+    @media screen and (max-width: 480px) {
+        .leaderboard-title {
+            font-size: 1.6em;
+        }
+        
+        .my-rank-card {
+            padding: 12px;
+        }
+        
+        .my-rank-card h3 {
+            font-size: 1.2em;
+        }
+        
+        .my-rank-number {
+            font-size: 2em;
+        }
+        
+        .stat-badge {
+            font-size: 9px;
+            padding: 2px 5px;
+            margin: 1px;
+            display: inline-block;
+        }
+        
+        .leaderboard-table table {
+            font-size: 11px;
+            min-width: 550px;
+        }
+        
+        .leaderboard-table th {
+            padding: 10px 6px;
+            font-size: 0.85em;
+        }
+        
+        .leaderboard-table td {
+            padding: 10px 6px;
+            font-size: 0.9em;
+        }
+        
+        .rank-cell {
+            font-size: 1em;
+        }
+        
+        .medal {
+            font-size: 1.3em;
+            margin-right: 3px;
+        }
+        
+        div[style*="margin-top: 30px; text-align: center;"] .btn {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+        }
+    }
 </style>
 {% endblock %}
 

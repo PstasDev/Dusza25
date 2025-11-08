@@ -245,6 +245,193 @@
         color: #1a1a2e;
         box-shadow: 0 0 20px rgba(218, 165, 32, 0.5);
     }
+    
+    /* ============================================
+       MOBILE RESPONSIVE STYLES
+       ============================================ */
+    
+    /* Mobile devices (max-width: 768px) */
+    @media screen and (max-width: 768px) {
+        .achievements-container {
+            padding: 0 10px;
+        }
+        
+        .achievements-title {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+        
+        .achievements-stats {
+            padding: 20px 15px;
+            margin-bottom: 20px;
+        }
+        
+        .achievements-stats h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .stat-row {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .stat-item {
+            min-width: 100%;
+            padding: 12px;
+        }
+        
+        .stat-label {
+            font-size: 0.85em;
+        }
+        
+        .stat-value {
+            font-size: 1.6em;
+        }
+        
+        .achievements-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .achievement-card {
+            padding: 18px;
+        }
+        
+        .achievement-icon {
+            font-size: 2.5em;
+        }
+        
+        .achievement-name {
+            font-size: 1.2em;
+        }
+        
+        .achievement-description {
+            font-size: 0.9em;
+            min-height: auto;
+        }
+        
+        .achievement-points {
+            font-size: 0.85em;
+            padding: 4px 10px;
+        }
+        
+        .progress-label {
+            font-size: 0.85em;
+        }
+        
+        .progress-bar-container {
+            height: 18px;
+        }
+        
+        .achievement-date {
+            font-size: 0.8em;
+        }
+        
+        .completion-badge {
+            font-size: 0.75em;
+            padding: 4px 12px;
+        }
+        
+        .filter-tabs {
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .filter-tab {
+            padding: 10px 18px;
+            font-size: 0.9em;
+            flex: 1 1 calc(50% - 10px);
+            text-align: center;
+        }
+        
+        div[style*="margin-top: 40px; text-align: center;"] .btn {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+        }
+    }
+    
+    /* Small mobile devices (max-width: 480px) */
+    @media screen and (max-width: 480px) {
+        .achievements-title {
+            font-size: 1.6em;
+        }
+        
+        .achievements-stats {
+            padding: 15px 10px;
+        }
+        
+        .achievements-stats h3 {
+            font-size: 1.3em;
+        }
+        
+        .stat-item {
+            padding: 10px;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+        }
+        
+        .stat-value {
+            font-size: 1.4em;
+        }
+        
+        .achievement-card {
+            padding: 15px;
+        }
+        
+        .achievement-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+        
+        .achievement-name {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        
+        .achievement-description {
+            font-size: 0.85em;
+        }
+        
+        .achievement-points {
+            font-size: 0.8em;
+            padding: 3px 8px;
+            top: 8px;
+            right: 8px;
+        }
+        
+        .progress-label {
+            font-size: 0.8em;
+        }
+        
+        .progress-bar-container {
+            height: 16px;
+        }
+        
+        .achievement-date {
+            font-size: 0.75em;
+        }
+        
+        .completion-badge {
+            font-size: 0.7em;
+            padding: 3px 10px;
+        }
+        
+        .filter-tabs {
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-tab {
+            flex: 1 1 100%;
+            padding: 10px 16px;
+            font-size: 0.85em;
+        }
+    }
 </style>
 {% endblock %}
 

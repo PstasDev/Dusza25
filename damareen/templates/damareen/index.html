@@ -91,6 +91,114 @@
         font-size: 18px;
         padding: 16px 32px;
     }
+    
+    /* ============================================
+       MOBILE RESPONSIVE STYLES
+       ============================================ */
+    
+    /* Mobile devices (max-width: 768px) */
+    @media screen and (max-width: 768px) {
+        .hero-section {
+            padding: 40px 15px;
+        }
+        
+        .hero-title {
+            font-size: 2.5em;
+            letter-spacing: 3px;
+        }
+        
+        .hero-subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .cta-buttons .btn {
+            display: block;
+            width: 100%;
+            margin: 8px 0;
+            font-size: 16px;
+            padding: 14px 24px;
+        }
+        
+        .feature-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .feature-card {
+            padding: 25px;
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+        }
+        
+        .rules-box {
+            padding: 25px 15px;
+        }
+        
+        .rules-box li {
+            font-size: 15px;
+            padding: 10px 0;
+        }
+        
+        .rules-box h3 {
+            font-size: 1.6em;
+            margin-bottom: 20px;
+        }
+    }
+    
+    /* Small mobile devices (max-width: 480px) */
+    @media screen and (max-width: 480px) {
+        .hero-section {
+            padding: 30px 10px;
+        }
+        
+        .hero-title {
+            font-size: 2em;
+            letter-spacing: 2px;
+        }
+        
+        .hero-subtitle {
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+        
+        .cta-buttons .btn {
+            font-size: 15px;
+            padding: 12px 20px;
+        }
+        
+        .feature-card {
+            padding: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.3em;
+        }
+        
+        .feature-icon {
+            font-size: 36px;
+        }
+        
+        .rules-box {
+            padding: 20px 12px;
+        }
+        
+        .rules-box li {
+            font-size: 14px;
+            padding: 8px 0;
+        }
+        
+        .rules-box h3 {
+            font-size: 1.4em;
+        }
+        
+        .elem-icon {
+            font-size: 9px;
+            padding: 3px 6px;
+        }
+    }
 </style>
 {% endblock %}
 

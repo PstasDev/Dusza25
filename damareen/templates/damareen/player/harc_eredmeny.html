@@ -97,6 +97,93 @@
         border: 2px solid rgba(218, 165, 32, 0.5);
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
+    
+    /* ============================================
+       MOBILE RESPONSIVE STYLES
+       ============================================ */
+    
+    /* Mobile devices (max-width: 768px) */
+    @media screen and (max-width: 768px) {
+        .battle-result {
+            padding: 20px 15px;
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin: 20px 0;
+        }
+        
+        .battle-grid {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 20px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .battle-card.player {
+            border-right: none;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+            padding-bottom: 15px;
+        }
+        
+        .battle-vs {
+            font-size: 36px;
+            order: 2;
+            padding: 10px 0;
+        }
+        
+        .battle-card.enemy {
+            border-left: none;
+            border-top: 2px solid rgba(211, 47, 47, 0.3);
+            padding-top: 15px;
+        }
+        
+        .battle-outcome {
+            font-size: 14px;
+            padding: 12px;
+        }
+        
+        .round-number {
+            padding: 6px 16px;
+            font-size: 14px;
+        }
+        
+        .kartya {
+            margin: 10px auto !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    /* Small mobile devices (max-width: 480px) */
+    @media screen and (max-width: 480px) {
+        .battle-result {
+            padding: 15px 10px;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+        
+        .battle-grid {
+            gap: 15px;
+            padding: 12px;
+        }
+        
+        .battle-card h4 {
+            font-size: 18px;
+        }
+        
+        .battle-vs {
+            font-size: 30px;
+        }
+        
+        .battle-outcome {
+            font-size: 13px;
+            padding: 10px;
+        }
+        
+        .round-number {
+            padding: 5px 14px;
+            font-size: 13px;
+        }
+    }
 </style>
 {% endblock %}
 
