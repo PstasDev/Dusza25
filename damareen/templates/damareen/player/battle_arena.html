@@ -1,681 +1,1154 @@
-{% extends 'damareen/base.html' %}
-
-{% block title %}⚔️ Harc Arena{% endblock %}
-
-{% block extra_css %}
-<style>
-    @keyframes cardFlip {
-        0% { transform: rotateY(90deg) scale(0.8); opacity: 0; }
-        100% { transform: rotateY(0) scale(1); opacity: 1; }
-    }
-    
-    @keyframes cardAttack {
-        0% { transform: translateX(0) scale(1); }
-        30% { transform: translateX(50px) scale(1.1); }
-        60% { transform: translateX(-50px) scale(1.1); }
-        100% { transform: translateX(0) scale(1); }
-    }
-    
-    @keyframes damageShake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-10px) rotate(-2deg); }
-        75% { transform: translateX(10px) rotate(2deg); }
-    }
-    
-    @keyframes victoryPulse {
-        0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
-        50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(16, 185, 129, 0.8); }
-    }
-    
-    @keyframes defeatFade {
-        0% { opacity: 1; transform: scale(1); }
-        100% { opacity: 0.3; transform: scale(0.9); filter: grayscale(100%); }
-    }
-    
-    @keyframes sparkle {
-        0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
-        50% { opacity: 1; transform: scale(1) rotate(180deg); }
-    }
-    
-    @keyframes slideInFromTop {
-        0% { transform: translateY(-100px); opacity: 0; }
-        100% { transform: translateY(0); opacity: 1; }
-    }
-    
-    @keyframes slideInFromBottom {
-        0% { transform: translateY(100px); opacity: 0; }
-        100% { transform: translateY(0); opacity: 1; }
-    }
-    
-    @keyframes floatUp {
-        0% { transform: translateY(0); opacity: 1; }
-        100% { transform: translateY(-50px); opacity: 0; }
-    }
-    
-    .battle-arena {
-        min-height: 80vh;
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        padding: 20px;
-    }
-    
-    .battle-status {
-        text-align: center;
-        padding: 20px;
-        background: linear-gradient(135deg, rgba(218, 165, 32, 0.2) 0%, rgba(139, 69, 19, 0.2) 100%);
-        border-radius: 15px;
-        border: 2px solid rgba(218, 165, 32, 0.4);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        animation: slideInFromTop 0.6s ease-out;
-    }
-    
-    .battle-status h2 {
-        margin: 0;
-        font-size: 2em;
-        color: #daa520;
-        text-shadow: 0 0 20px rgba(218, 165, 32, 0.6);
-    }
-    
-    .round-counter {
-        display: inline-block;
-        background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
-        color: #daa520;
-        padding: 10px 25px;
-        border-radius: 25px;
-        font-family: 'Cinzel', serif;
-        font-weight: 700;
-        margin: 15px 0;
-        border: 3px solid rgba(218, 165, 32, 0.6);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-        font-size: 1.2em;
-    }
-    
-    .battle-field {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 40px;
-        align-items: center;
-        padding: 40px 20px;
-        background: linear-gradient(135deg, rgba(20, 20, 40, 0.6) 0%, rgba(40, 20, 60, 0.6) 100%);
-        border-radius: 20px;
-        border: 2px solid rgba(218, 165, 32, 0.3);
-        min-height: 500px;
-    }
-    
-    .card-slot {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 400px;
-        position: relative;
-    }
-    
-    .card-slot.player {
-        animation: slideInFromBottom 0.8s ease-out;
-    }
-    
-    .card-slot.enemy {
-        animation: slideInFromTop 0.8s ease-out;
-    }
-    
-    .battle-card {
-        width: 100%;
-        max-width: 280px;
-        opacity: 0;
-        transform: scale(0.5);
-        transition: all 0.5s ease;
-        position: relative;
-    }
-    
-    .battle-card.revealed {
-        animation: cardFlip 0.6s ease-out forwards;
-    }
-    
-    .battle-card.attacking {
-        animation: cardAttack 0.8s ease-in-out;
-    }
-    
-    .battle-card.damaged {
-        animation: damageShake 0.5s ease-in-out;
-    }
-    
-    .battle-card.victory {
-        animation: victoryPulse 1s ease-in-out infinite;
-    }
-    
-    .battle-card.defeat {
-        animation: defeatFade 0.8s ease-out forwards;
-    }
-    
-    .battle-vs {
-        text-align: center;
-        font-size: 80px;
-        color: #daa520;
-        text-shadow: 
-            0 0 30px rgba(218, 165, 32, 0.8),
-            0 0 60px rgba(218, 165, 32, 0.4);
-        font-family: 'Cinzel', serif;
-        animation: sparkle 2s ease-in-out infinite;
-    }
-    
-    .damage-number {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 48px;
-        font-weight: bold;
-        color: #ff4757;
-        text-shadow: 0 0 20px rgba(255, 71, 87, 0.8);
-        animation: floatUp 1s ease-out forwards;
-        pointer-events: none;
-        z-index: 100;
-    }
-    
-    .battle-log {
-        max-height: 200px;
-        overflow-y: auto;
-        padding: 20px;
-        background: rgba(20, 20, 40, 0.8);
-        border-radius: 12px;
-        border: 2px solid rgba(218, 165, 32, 0.3);
-        font-family: 'Crimson Text', serif;
-    }
-    
-    .battle-log-entry {
-        padding: 10px 15px;
-        margin: 8px 0;
-        border-left: 4px solid;
-        border-radius: 6px;
-        animation: slideInFromBottom 0.3s ease-out;
-        background: rgba(30, 30, 50, 0.6);
-    }
-    
-    .battle-log-entry.info {
-        border-left-color: #3498db;
-        color: #64b5f6;
-    }
-    
-    .battle-log-entry.success {
-        border-left-color: #10b981;
-        color: #90ee90;
-    }
-    
-    .battle-log-entry.error {
-        border-left-color: #e74c3c;
-        color: #ff6b6b;
-    }
-    
-    .battle-log-entry.warning {
-        border-left-color: #f39c12;
-        color: #ffb74d;
-    }
-    
-    .score-board {
-        display: flex;
-        justify-content: space-around;
-        padding: 20px;
-        background: linear-gradient(135deg, rgba(30, 30, 50, 0.8) 0%, rgba(40, 20, 60, 0.8) 100%);
-        border-radius: 12px;
-        border: 2px solid rgba(218, 165, 32, 0.3);
-    }
-    
-    .score-item {
-        text-align: center;
-        padding: 15px 30px;
-        border-radius: 10px;
-        background: rgba(20, 20, 40, 0.6);
-        border: 2px solid rgba(218, 165, 32, 0.4);
-    }
-    
-    .score-label {
-        font-size: 14px;
-        color: #94a3b8;
-        margin-bottom: 5px;
-    }
-    
-    .score-value {
-        font-size: 32px;
-        font-weight: bold;
-        font-family: 'Cinzel', serif;
-    }
-    
-    .score-value.player {
-        color: #64b5f6;
-    }
-    
-    .score-value.enemy {
-        color: #ff6b6b;
-    }
-    
-    .final-result {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        padding: 60px 80px;
-        border-radius: 25px;
-        text-align: center;
-        z-index: 1000;
-        font-size: 48px;
-        font-family: 'Cinzel', serif;
-        font-weight: 700;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-        opacity: 0;
-        transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    }
-    
-    .final-result.show {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    
-    .final-result.victory {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.95) 100%);
-        border: 5px solid #10b981;
-        color: #fff;
-        text-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
-        box-shadow: 0 0 80px rgba(16, 185, 129, 0.6);
-    }
-    
-    .final-result.defeat {
-        background: linear-gradient(135deg, rgba(239, 68, 68, 0.95) 0%, rgba(220, 38, 38, 0.95) 100%);
-        border: 5px solid #ef4444;
-        color: #fff;
-        text-shadow: 0 0 30px rgba(239, 68, 68, 0.8);
-        box-shadow: 0 0 80px rgba(239, 68, 68, 0.6);
-    }
-    
-    .loading-spinner {
-        display: inline-block;
-        width: 50px;
-        height: 50px;
-        border: 5px solid rgba(218, 165, 32, 0.3);
-        border-top: 5px solid #daa520;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    .auto-save-indicator {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 10px 20px;
-        background: rgba(16, 185, 129, 0.9);
-        color: white;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: bold;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.3s ease;
-        z-index: 1000;
-    }
-    
-    .auto-save-indicator.show {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    
-    /* Scrollbar styling */
-    .battle-log::-webkit-scrollbar {
-        width: 8px;
-    }
-    
-    .battle-log::-webkit-scrollbar-track {
-        background: rgba(20, 20, 40, 0.5);
-        border-radius: 4px;
-    }
-    
-    .battle-log::-webkit-scrollbar-thumb {
-        background: rgba(218, 165, 32, 0.5);
-        border-radius: 4px;
-    }
-    
-    .battle-log::-webkit-scrollbar-thumb:hover {
-        background: rgba(218, 165, 32, 0.7);
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="battle-arena">
-    <!-- Battle Status -->
-    <div class="battle-status">
-        <h2 id="battle-title">🏰 {{ kazamata.nev }}</h2>
-        <div class="round-counter" id="round-counter">
-            ⚔️ Felkészülés...
-        </div>
-        <div id="status-message" style="margin-top: 15px; font-size: 18px; color: #cbd5e0;">
-            <span class="loading-spinner"></span>
-            <span style="margin-left: 15px;">Csatlakozás a harci rendszerhez...</span>
-        </div>
-    </div>
-    
-    <!-- Score Board -->
-    <div class="score-board">
-        <div class="score-item">
-            <div class="score-label">👤 Játékos győzelmek</div>
-            <div class="score-value player" id="player-score">0</div>
-        </div>
-        <div class="score-item">
-            <div class="score-label">📊 Összes ütközet</div>
-            <div class="score-value" style="color: #daa520;" id="total-rounds">0</div>
-        </div>
-        <div class="score-item">
-            <div class="score-label">🏰 Kazamata győzelmek</div>
-            <div class="score-value enemy" id="enemy-score">0</div>
-        </div>
-    </div>
-    
-    <!-- Battle Field -->
-    <div class="battle-field">
-        <!-- Player Card Slot -->
-        <div class="card-slot player">
-            <h3 style="color: #64b5f6; margin-bottom: 20px; font-size: 24px;">👤 Saját kártya</h3>
-            <div id="player-card-slot">
-                <div style="text-align: center; color: #64748b; font-size: 18px;">
-                    ⏳ Várakozás...
-                </div>
-            </div>
-        </div>
-        
-        <!-- VS Symbol -->
-        <div class="battle-vs">⚔️</div>
-        
-        <!-- Enemy Card Slot -->
-        <div class="card-slot enemy">
-            <h3 style="color: #ff6b6b; margin-bottom: 20px; font-size: 24px;">🏰 Ellenség</h3>
-            <div id="enemy-card-slot">
-                <div style="text-align: center; color: #64748b; font-size: 18px;">
-                    ⏳ Várakozás...
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Battle Log -->
-    <div class="card">
-        <h3>📜 Harc Napló</h3>
-        <div class="battle-log" id="battle-log">
-            <div class="battle-log-entry info">
-                ⚔️ A harc hamarosan kezdődik...
-            </div>
-        </div>
-    </div>
-    
-    <!-- Action Buttons -->
-    <div style="text-align: center; margin-top: 20px;">
-        <button id="start-battle-btn" class="btn btn-danger" style="font-size: 20px; padding: 18px 40px;">
-            ⚔️ HARC INDÍTÁSA
-        </button>
-        <a href="{% url 'damareen:game_view' jatek.id %}" class="btn btn-secondary" style="font-size: 18px; margin-left: 15px;">
-            🔙 Mégse
-        </a>
-    </div>
-</div>
-
-<!-- Final Result Overlay -->
-<div class="final-result" id="final-result"></div>
-
-<!-- Auto-save Indicator -->
-<div class="auto-save-indicator" id="auto-save-indicator">
-    💾 Automatikus mentés...
-</div>
-
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    const jatekId = {{ jatek.id }};
-    const kazamataId = {{ kazamata.id }};
-    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
-    const wsPath = wsScheme + '://' + window.location.host + '/ws/battle/' + jatekId + '/' + kazamataId + '/';
-    
-    let battleSocket = null;
-    let playerScore = 0;
-    let enemyScore = 0;
-    let totalRounds = 0;
-    let currentHarcId = null;
-    
-    // DOM Elements
-    const startBattleBtn = document.getElementById('start-battle-btn');
-    const statusMessage = document.getElementById('status-message');
-    const roundCounter = document.getElementById('round-counter');
-    const playerCardSlot = document.getElementById('player-card-slot');
-    const enemyCardSlot = document.getElementById('enemy-card-slot');
-    const battleLog = document.getElementById('battle-log');
-    const finalResult = document.getElementById('final-result');
-    const autoSaveIndicator = document.getElementById('auto-save-indicator');
-    
-    function connectWebSocket() {
-        battleSocket = new WebSocket(wsPath);
-        
-        battleSocket.onopen = function(e) {
-            addLog('✅ Kapcsolat létrejött!', 'success');
-            updateStatus('✨ Készen áll a harcra!');
-            startBattleBtn.disabled = false;
-        };
-        
-        battleSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            handleMessage(data);
-        };
-        
-        battleSocket.onerror = function(e) {
-            addLog('❌ WebSocket hiba történt!', 'error');
-            updateStatus('❌ Kapcsolati hiba!');
-        };
-        
-        battleSocket.onclose = function(e) {
-            addLog('🔌 Kapcsolat lezárva', 'warning');
-        };
-    }
-    
-    function handleMessage(data) {
-        const type = data.type;
-        
-        if (type === 'connection') {
-            addLog(data.message, 'info');
-        } else if (type === 'battle_start') {
-            handleBattleStart(data);
-        } else if (type === 'round_start') {
-            handleRoundStart(data);
-        } else if (type === 'card_reveal') {
-            handleCardReveal(data);
-        } else if (type === 'battle_animation') {
-            handleBattleAnimation(data);
-        } else if (type === 'round_result') {
-            handleRoundResult(data);
-        } else if (type === 'battle_end') {
-            handleBattleEnd(data);
-        } else if (type === 'error') {
-            addLog(data.message, 'error');
-            updateStatus(data.message);
-            startBattleBtn.disabled = false;
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚔️ Harc - {{ kazamata.nev }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles-confetti@2.12.0/tsparticles.confetti.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    }
-    
-    function handleBattleStart(data) {
-        addLog(data.message, 'success');
-        updateStatus('⚔️ A harc folyamatban...');
-        totalRounds = data.total_rounds;
-        updateScoreboard();
-        startBattleBtn.disabled = true;
-    }
-    
-    function handleRoundStart(data) {
-        addLog(data.message, 'info');
-        roundCounter.textContent = `⚔️ Ütközet #${data.round}`;
         
-        // Clear card slots
-        playerCardSlot.innerHTML = '<div style="text-align: center; color: #64748b;">🎴 Kártya felfordítás...</div>';
-        enemyCardSlot.innerHTML = '<div style="text-align: center; color: #64748b;">🎴 Kártya felfordítás...</div>';
-    }
-    
-    function handleCardReveal(data) {
-        const card = data.card;
-        const side = data.side;
-        const slot = side === 'player' ? playerCardSlot : enemyCardSlot;
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
         
-        const cardHtml = `
-            <div class="battle-card kartya-${card.element} revealed">
-                <div class="kartya kartya-${card.element}">
-                    <h3>${card.name} ${card.is_leader ? '👑' : ''}</h3>
-                    <div class="kartya-stat">
-                        <span>⚔️ Sebzés:</span>
-                        <span style="color: #daa520;">${card.damage}</span>
-                    </div>
-                    <div class="kartya-stat">
-                        <span>❤️ Életerő:</span>
-                        <span style="color: #e74c3c;">${card.hp}</span>
-                    </div>
-                    <div style="margin-top: 10px; text-align: center;">
-                        <span class="elem-icon elem-${card.element}">
-                            ${card.element_display}
-                        </span>
+        .battle-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            padding: 15px;
+            gap: 12px;
+        }
+        
+        /* Top Bar - Compact */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(20, 20, 40, 0.8);
+            padding: 10px 25px;
+            border-radius: 10px;
+            border: 2px solid rgba(218, 165, 32, 0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        
+        .kazamata-title {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            color: #daa520;
+            text-shadow: 0 0 15px rgba(218, 165, 32, 0.6);
+        }
+        
+        .top-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: 2px solid #dc2626;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+        }
+        
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
+        }
+        
+        .btn-danger:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+            color: white;
+            border: 2px solid #4b5563;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(75, 85, 99, 0.6);
+        }
+        
+        /* Battle Info - Compact */
+        .battle-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            background: linear-gradient(135deg, rgba(218, 165, 32, 0.15) 0%, rgba(139, 69, 19, 0.15) 100%);
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(218, 165, 32, 0.3);
+        }
+        
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(20, 20, 40, 0.9);
+            padding: 10px 35px;
+            border-radius: 50px;
+            border: 3px solid rgba(218, 165, 32, 0.5);
+            font-family: 'Cinzel', serif;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .score-player {
+            color: #64b5f6;
+            text-shadow: 0 0 15px rgba(100, 181, 246, 0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .score-separator {
+            color: #daa520;
+            font-size: 1.2em;
+        }
+        
+        .score-enemy {
+            color: #ff6b6b;
+            text-shadow: 0 0 15px rgba(255, 107, 107, 0.8);
+            transition: transform 0.3s ease;
+        }
+        
+        .round-info {
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
+            color: #daa520;
+            background: rgba(20, 20, 40, 0.6);
+            padding: 6px 18px;
+            border-radius: 20px;
+            border: 2px solid rgba(218, 165, 32, 0.4);
+        }
+        
+        .status-message {
+            font-size: 15px;
+            color: #cbd5e0;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #daa520;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Battle Field - Main Area */
+        .battle-field {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 25px;
+            align-items: center;
+            justify-items: center;
+            padding: 10px;
+        }
+        
+        .card-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            max-width: 320px;
+        }
+        
+        .card-slot-title {
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .card-slot.player .card-slot-title {
+            color: #64b5f6;
+            text-shadow: 0 0 10px rgba(100, 181, 246, 0.6);
+        }
+        
+        .card-slot.enemy .card-slot-title {
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.6);
+        }
+        
+        .battle-vs {
+            font-size: 70px;
+            text-shadow: 0 0 30px rgba(218, 165, 32, 0.8);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        /* Card Styles - Fixed Aspect Ratio */
+        .card-container {
+            width: 100%;
+            max-width: 280px;
+            aspect-ratio: 2.5 / 3.5; /* Standard card ratio */
+            perspective: 1000px;
+        }
+        
+        .kartya {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 4px solid;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        /* Type-specific card designs with emojis */
+        .kartya-tuz {
+            background: linear-gradient(135deg, 
+                rgba(220, 38, 38, 0.95) 0%, 
+                rgba(153, 27, 27, 0.95) 100%);
+            border-color: #ff4444;
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.6),
+                        inset 0 0 50px rgba(255, 100, 100, 0.2);
+        }
+        
+        .kartya-tuz::before {
+            content: '🔥';
+            position: absolute;
+            font-size: 180px;
+            opacity: 0.15;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            pointer-events: none;
+        }
+        
+        .kartya-viz {
+            background: linear-gradient(135deg, 
+                rgba(59, 130, 246, 0.95) 0%, 
+                rgba(29, 78, 216, 0.95) 100%);
+            border-color: #60a5fa;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.6),
+                        inset 0 0 50px rgba(147, 197, 253, 0.2);
+        }
+        
+        .kartya-viz::before {
+            content: '💧';
+            position: absolute;
+            font-size: 180px;
+            opacity: 0.15;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            pointer-events: none;
+        }
+        
+        .kartya-fold {
+            background: linear-gradient(135deg, 
+                rgba(34, 197, 94, 0.95) 0%, 
+                rgba(22, 163, 74, 0.95) 100%);
+            border-color: #4ade80;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.6),
+                        inset 0 0 50px rgba(134, 239, 172, 0.2);
+        }
+        
+        .kartya-fold::before {
+            content: '🌿';
+            position: absolute;
+            font-size: 180px;
+            opacity: 0.15;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            pointer-events: none;
+        }
+        
+        .kartya-levego {
+            background: linear-gradient(135deg, 
+                rgba(168, 85, 247, 0.95) 0%, 
+                rgba(126, 34, 206, 0.95) 100%);
+            border-color: #c084fc;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.6),
+                        inset 0 0 50px rgba(216, 180, 254, 0.2);
+        }
+        
+        .kartya-levego::before {
+            content: '💨';
+            position: absolute;
+            font-size: 180px;
+            opacity: 0.15;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            pointer-events: none;
+        }
+        
+        .kartya-header {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .kartya h3 {
+            margin: 0;
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            font-weight: 700;
+        }
+        
+        .kartya-type-icon {
+            font-size: 40px;
+            margin: 8px 0;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
+        
+        .kartya-stats {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .kartya-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        
+        .kartya-stat-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .kartya-stat-value {
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+        
+        .kartya-footer {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding-top: 10px;
+            border-top: 3px solid rgba(255, 255, 255, 0.3);
+            margin-top: auto;
+        }
+        
+        .kartya-element-label {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+        
+        .card-back {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(139, 69, 19, 0.98) 0%, 
+                rgba(101, 67, 33, 0.98) 50%,
+                rgba(139, 69, 19, 0.98) 100%);
+            border: 5px solid #daa520;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.5),
+                inset 0 0 80px rgba(218, 165, 32, 0.2),
+                0 0 40px rgba(218, 165, 32, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-back::before {
+            content: '⚔️';
+            position: absolute;
+            font-size: 150px;
+            opacity: 0.12;
+            transform: rotate(-15deg);
+            animation: slowRotate 20s linear infinite;
+        }
+        
+        @keyframes slowRotate {
+            from { transform: rotate(-15deg); }
+            to { transform: rotate(345deg); }
+        }
+        
+        .card-back::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            border: 4px solid rgba(218, 165, 32, 0.5);
+            border-radius: 10px;
+            pointer-events: none;
+        }
+        
+        .card-back-pattern {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: #daa520;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .card-back-logo {
+            font-size: 90px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(218, 165, 32, 0.9);
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6));
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6)); }
+            50% { filter: drop-shadow(0 0 20px rgba(218, 165, 32, 0.8)); }
+        }
+        
+        .card-back-text {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.8);
+        }
+        
+        /* Animations - Fixed to prevent flashing */
+        @keyframes cardFlipIn {
+            0% { 
+                transform: rotateY(180deg) scale(0.9); 
+                opacity: 0; 
+            }
+            100% { 
+                transform: rotateY(0deg) scale(1); 
+                opacity: 1; 
+            }
+        }
+        
+        @keyframes cardFlipToFront {
+            0% { transform: rotateY(180deg); }
+            100% { transform: rotateY(0deg); }
+        }
+        
+        @keyframes cardAttack {
+            0%, 100% { transform: translateX(0) scale(1) rotate(0deg); }
+            25% { transform: translateX(20px) scale(1.05) rotate(3deg); }
+            50% { transform: translateX(-20px) scale(1.05) rotate(-3deg); }
+            75% { transform: translateX(10px) scale(1.05) rotate(2deg); }
+        }
+        
+        @keyframes damageShake {
+            0%, 100% { transform: translateX(0) rotate(0deg); filter: brightness(1); }
+            10%, 30%, 50%, 70% { transform: translateX(-12px) rotate(-2deg); filter: brightness(1.3) contrast(1.2); }
+            20%, 40%, 60%, 80% { transform: translateX(12px) rotate(2deg); filter: brightness(0.8) contrast(1.2); }
+            90% { transform: translateX(0) rotate(0deg); filter: brightness(1); }
+        }
+        
+        @keyframes victoryGlow {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.8),
+                            0 0 60px rgba(16, 185, 129, 0.6),
+                            inset 0 0 30px rgba(16, 185, 129, 0.3);
+                filter: brightness(1.1) saturate(1.3);
+            }
+            50% { 
+                transform: scale(1.05); 
+                box-shadow: 0 0 50px rgba(16, 185, 129, 1),
+                            0 0 100px rgba(16, 185, 129, 0.8),
+                            inset 0 0 50px rgba(16, 185, 129, 0.5);
+                filter: brightness(1.3) saturate(1.5);
+            }
+        }
+        
+        @keyframes defeatFade {
+            0% { 
+                opacity: 1; 
+                transform: scale(1) rotate(0deg); 
+                filter: grayscale(0%) brightness(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(0.95) rotate(-3deg);
+                filter: grayscale(50%) brightness(0.8);
+            }
+            100% { 
+                opacity: 0.3; 
+                transform: scale(0.9) rotate(-5deg); 
+                filter: grayscale(100%) brightness(0.5);
+            }
+        }
+        
+        @keyframes skullDeath {
+            0% { 
+                opacity: 0;
+                transform: translateY(-50px) scale(0) rotate(-45deg);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(0) scale(1.3) rotate(10deg);
+            }
+            100% {
+                opacity: 0.9;
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+        }
+        
+        @keyframes confettiPop {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2) rotate(180deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(360deg);
+            }
+        }
+        
+        @keyframes winnerBanner {
+            0% { 
+                transform: scale(0.5) rotate(-10deg); 
+                opacity: 0; 
+            }
+            60% { 
+                transform: scale(1.15) rotate(2deg); 
+            }
+            100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 1; 
+            }
+        }
+        
+        .battle-card {
+            width: 100%;
+            height: 100%;
+            opacity: 1;
+            transform-style: preserve-3d;
+            transition: none;
+        }
+        
+        .battle-card.revealed {
+            animation: cardFlipIn 0.8s ease-out forwards;
+        }
+        
+        .battle-card.attacking {
+            animation: cardAttack 1s ease-in-out;
+        }
+        
+        .battle-card.damaged {
+            animation: damageShake 0.6s ease-in-out;
+        }
+        
+        .battle-card.victory {
+            animation: victoryGlow 1.5s ease-in-out infinite;
+        }
+        
+        .battle-card.defeat {
+            animation: defeatFade 1s ease-out forwards;
+        }
+        
+        .death-skull {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            z-index: 10;
+            animation: skullDeath 0.8s ease-out forwards;
+            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.9));
+        }
+        
+        .confetti-emoji {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            z-index: 10;
+            animation: confettiPop 0.6s ease-out forwards;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+        }
+        
+        .round-result-banner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 18px 40px;
+            border-radius: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            font-family: 'Cinzel', serif;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            z-index: 15;
+            animation: winnerBanner 0.5s ease-out forwards;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+        }
+        
+        .round-result-banner.win {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 5px solid #10b981;
+            color: white;
+            text-shadow: 0 0 25px rgba(16, 185, 129, 1);
+        }
+        
+        .round-result-banner.lose {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: 5px solid #ef4444;
+            color: white;
+            text-shadow: 0 0 25px rgba(239, 68, 68, 1);
+        }
+        
+        /* Final Result */
+        .final-result {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            padding: 60px 90px;
+            border-radius: 25px;
+            text-align: center;
+            z-index: 1000;
+            font-size: 50px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .final-result.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        
+        .final-result.victory {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.98) 0%, rgba(5, 150, 105, 0.98) 100%);
+            border: 6px solid #10b981;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(16, 185, 129, 1),
+                         0 0 80px rgba(16, 185, 129, 0.6);
+            box-shadow: 0 0 100px rgba(16, 185, 129, 0.8),
+                        inset 0 0 60px rgba(255, 255, 255, 0.2);
+            animation: victoryGlow 1.5s ease-in-out infinite;
+        }
+        
+        .final-result.defeat {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.98) 0%, rgba(220, 38, 38, 0.98) 100%);
+            border: 6px solid #ef4444;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(239, 68, 68, 1),
+                         0 0 80px rgba(239, 68, 68, 0.6);
+            box-shadow: 0 0 100px rgba(239, 68, 68, 0.8),
+                        inset 0 0 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Auto-save Indicator */
+        .auto-save-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .auto-save-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="battle-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="kazamata-title">🏰 {{ kazamata.nev }}</div>
+            <div class="top-actions">
+                <button id="start-battle-btn" class="btn btn-danger" disabled>⚔️ HARC INDÍTÁSA</button>
+                <a href="{% url 'damareen:game_view' jatek.id %}" class="btn btn-secondary">🔙 Vissza</a>
+            </div>
+        </div>
+        
+        <!-- Battle Info -->
+        <div class="battle-info">
+            <div class="score-display">
+                <span class="score-player" id="player-score">0</span>
+                <span class="score-separator">:</span>
+                <span class="score-enemy" id="enemy-score">0</span>
+            </div>
+            <div class="round-info" id="round-counter">⚔️ Felkészülés...</div>
+            <div class="status-message">
+                <span class="loading-spinner"></span>
+                <span id="status-text">Csatlakozás a harci rendszerhez...</span>
+            </div>
+        </div>
+        
+        <!-- Battle Field -->
+        <div class="battle-field">
+            <!-- Player Card -->
+            <div class="card-slot player">
+                <div class="card-slot-title">👤 Saját kártya</div>
+                <div class="card-container" id="player-card-slot">
+                    <div class="card-back">
+                        <div class="card-back-pattern">
+                            <div class="card-back-logo">🎴</div>
+                            <div class="card-back-text">DAMAREEN</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        `;
-        
-        slot.innerHTML = cardHtml;
-        addLog(`${side === 'player' ? '👤' : '🏰'} ${card.name} felfordítva!`, 'info');
-    }
+            
+            <!-- VS Symbol -->
+            <div class="battle-vs">⚔️</div>
+            
+            <!-- Enemy Card -->
+            <div class="card-slot enemy">
+                <div class="card-slot-title">🏰 Ellenség</div>
+                <div class="card-container" id="enemy-card-slot">
+                    <div class="card-back">
+                        <div class="card-back-pattern">
+                            <div class="card-back-logo">🏰</div>
+                            <div class="card-back-text">KAZAMATA</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    function handleBattleAnimation(data) {
-        const playerCard = playerCardSlot.querySelector('.battle-card');
-        const enemyCard = enemyCardSlot.querySelector('.battle-card');
+    <!-- Final Result Overlay -->
+    <div class="final-result" id="final-result"></div>
+    
+    <!-- Auto-save Indicator -->
+    <div class="auto-save-indicator" id="auto-save-indicator">
+        💾 Automatikus mentés...
+    </div>
+    
+    <script>
+        const jatekId = {{ jatek.id }};
+        const kazamataId = {{ kazamata.id }};
+        const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const wsPath = wsScheme + '://' + window.location.host + '/ws/battle/' + jatekId + '/' + kazamataId + '/';
         
-        if (playerCard && enemyCard) {
-            // Attack animation
-            playerCard.classList.add('attacking');
-            enemyCard.classList.add('attacking');
+        let battleSocket = null;
+        let playerScore = 0;
+        let enemyScore = 0;
+        let totalRounds = 0;
+        let currentHarcId = null;
+        
+        // DOM Elements
+        const startBattleBtn = document.getElementById('start-battle-btn');
+        const statusText = document.getElementById('status-text');
+        const roundCounter = document.getElementById('round-counter');
+        const playerCardSlot = document.getElementById('player-card-slot');
+        const enemyCardSlot = document.getElementById('enemy-card-slot');
+        const finalResult = document.getElementById('final-result');
+        const autoSaveIndicator = document.getElementById('auto-save-indicator');
+        
+        function connectWebSocket() {
+            battleSocket = new WebSocket(wsPath);
+            
+            battleSocket.onopen = function(e) {
+                console.log('WebSocket connected!');
+                updateStatus('✅ Kapcsolat létrejött! Kattints a HARC INDÍTÁSA gombra!');
+                startBattleBtn.disabled = false;
+            };
+            
+            battleSocket.onmessage = function(e) {
+                console.log('Message received:', e.data);
+                const data = JSON.parse(e.data);
+                handleMessage(data);
+            };
+            
+            battleSocket.onerror = function(e) {
+                console.error('WebSocket error:', e);
+                updateStatus('❌ Kapcsolati hiba! Ellenőrizd, hogy a szerver fut-e.');
+            };
+            
+            battleSocket.onclose = function(e) {
+                console.log('WebSocket closed');
+                if (!currentHarcId) {
+                    updateStatus('🔌 Kapcsolat megszakadt');
+                }
+            };
+        }
+        
+        function handleMessage(data) {
+            console.log('Handling message type:', data.type);
+            const type = data.type;
+            
+            if (type === 'connection') {
+                console.log('Connection message:', data.message);
+                updateStatus(data.message);
+                startBattleBtn.disabled = false;
+            } else if (type === 'battle_start') {
+                handleBattleStart(data);
+            } else if (type === 'round_start') {
+                handleRoundStart(data);
+            } else if (type === 'card_reveal') {
+                handleCardReveal(data);
+            } else if (type === 'battle_animation') {
+                handleBattleAnimation(data);
+            } else if (type === 'round_result') {
+                handleRoundResult(data);
+            } else if (type === 'battle_end') {
+                handleBattleEnd(data);
+            } else if (type === 'error') {
+                console.error('Error message:', data.message);
+                updateStatus('❌ ' + data.message);
+                startBattleBtn.disabled = false;
+                startBattleBtn.style.display = 'inline-block';
+            }
+        }
+        
+        function handleBattleStart(data) {
+            updateStatus('⚔️ A harc folyamatban...');
+            totalRounds = data.total_rounds;
+            updateScoreboard();
+            startBattleBtn.disabled = true;
+            startBattleBtn.style.display = 'none';
+        }
+        
+        function handleRoundStart(data) {
+            roundCounter.textContent = `⚔️ Ütközet #${data.round}`;
+            
+            // Show card backs
+            playerCardSlot.innerHTML = `
+                <div class="card-back" style="animation: cardFlipToFront 0.6s ease-out;">
+                    <div class="card-back-pattern">
+                        <div class="card-back-logo">🎴</div>
+                        <div class="card-back-text">DAMAREEN</div>
+                    </div>
+                </div>
+            `;
+            enemyCardSlot.innerHTML = `
+                <div class="card-back" style="animation: cardFlipToFront 0.6s ease-out;">
+                    <div class="card-back-pattern">
+                        <div class="card-back-logo">🏰</div>
+                        <div class="card-back-text">KAZAMATA</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function handleCardReveal(data) {
+            const card = data.card;
+            const side = data.side;
+            const slot = side === 'player' ? playerCardSlot : enemyCardSlot;
+            
+            // Get type emoji
+            const typeEmojis = {
+                'tuz': '🔥',
+                'viz': '💧',
+                'fold': '🌿',
+                'levego': '💨'
+            };
+            const typeEmoji = typeEmojis[card.element] || '⚡';
+            
+            const cardHtml = `
+                <div class="battle-card revealed">
+                    <div class="kartya kartya-${card.element}">
+                        <div class="kartya-header">
+                            <h3>${card.name} ${card.is_leader ? '👑' : ''}</h3>
+                            <div class="kartya-type-icon">${typeEmoji}</div>
+                        </div>
+                        <div class="kartya-stats">
+                            <div class="kartya-stat">
+                                <span class="kartya-stat-label">⚔️ Sebzés</span>
+                                <span class="kartya-stat-value">${card.damage}</span>
+                            </div>
+                            <div class="kartya-stat">
+                                <span class="kartya-stat-label">❤️ Életerő</span>
+                                <span class="kartya-stat-value">${card.hp}</span>
+                            </div>
+                        </div>
+                        <div class="kartya-footer">
+                            <div class="kartya-element-label">${card.element_display}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            slot.innerHTML = cardHtml;
+        }
+        
+        function handleBattleAnimation(data) {
+            const winner = data.winner;
             
             setTimeout(() => {
-                playerCard.classList.remove('attacking');
-                enemyCard.classList.remove('attacking');
+                const playerCard = playerCardSlot.querySelector('.battle-card');
+                const enemyCard = enemyCardSlot.querySelector('.battle-card');
                 
-                // Damage shake
-                const loser = data.winner === 'player' ? enemyCard : playerCard;
-                loser.classList.add('damaged');
+                if (playerCard) playerCard.classList.add('attacking');
+                if (enemyCard) enemyCard.classList.add('attacking');
                 
                 setTimeout(() => {
-                    loser.classList.remove('damaged');
-                }, 500);
-            }, 800);
-        }
-    }
-    
-    function handleRoundResult(data) {
-        const winner = data.winner;
-        const reason = data.reason;
-        
-        if (winner === 'player') {
-            playerScore++;
-            addLog(`✅ Játékos győzött! ${reason}`, 'success');
-            const playerCard = playerCardSlot.querySelector('.battle-card');
-            if (playerCard) playerCard.classList.add('victory');
-            const enemyCard = enemyCardSlot.querySelector('.battle-card');
-            if (enemyCard) enemyCard.classList.add('defeat');
-        } else {
-            enemyScore++;
-            addLog(`❌ Kazamata győzött! ${reason}`, 'error');
-            const enemyCard = enemyCardSlot.querySelector('.battle-card');
-            if (enemyCard) enemyCard.classList.add('victory');
-            const playerCard = playerCardSlot.querySelector('.battle-card');
-            if (playerCard) playerCard.classList.add('defeat');
+                    if (playerCard) playerCard.classList.remove('attacking');
+                    if (enemyCard) enemyCard.classList.remove('attacking');
+                    
+                    const loser = winner === 'player' ? enemyCard : playerCard;
+                    if (loser) loser.classList.add('damaged');
+                }, 1200);
+            }, 100);
         }
         
-        updateScoreboard();
-    }
-    
-    function handleBattleEnd(data) {
-        currentHarcId = data.harc_id;
-        const winner = data.winner;
-        
-        addLog(data.message, winner === 'player' ? 'success' : 'error');
-        updateStatus(data.message);
-        roundCounter.textContent = `🏁 Harc befejezve!`;
-        
-        // Show auto-save indicator
-        showAutoSave();
-        
-        // Show final result
-        setTimeout(() => {
-            finalResult.textContent = data.message;
-            finalResult.className = `final-result ${winner === 'player' ? 'victory' : 'defeat'}`;
-            finalResult.classList.add('show');
+        function handleRoundResult(data) {
+            const winner = data.winner;
             
-            // Redirect after 3 seconds
-            setTimeout(() => {
-                if (winner === 'player') {
-                    window.location.href = `/player/game/${jatekId}/harc/${currentHarcId}/jutalom/`;
-                } else {
-                    window.location.href = `/player/game/${jatekId}/`;
+            if (winner === 'player') {
+                playerScore++;
+                const playerCard = playerCardSlot.querySelector('.battle-card');
+                if (playerCard) {
+                    playerCard.classList.add('victory');
+                    
+                    // Fire confetti for player victory
+                    fireConfetti();
+                    
+                    // Add confetti emoji
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti-emoji';
+                    confetti.textContent = '🎉';
+                    playerCardSlot.style.position = 'relative';
+                    playerCardSlot.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 1500);
+                    
+                    // Add winner banner
+                    const banner = document.createElement('div');
+                    banner.className = 'round-result-banner win';
+                    banner.textContent = '✅ GYŐZELEM!';
+                    playerCardSlot.appendChild(banner);
+                    setTimeout(() => banner.remove(), 2000);
                 }
-            }, 3000);
-        }, 1000);
-    }
-    
-    function updateScoreboard() {
-        document.getElementById('player-score').textContent = playerScore;
-        document.getElementById('enemy-score').textContent = enemyScore;
-        document.getElementById('total-rounds').textContent = totalRounds;
-    }
-    
-    function addLog(message, type = 'info') {
-        const entry = document.createElement('div');
-        entry.className = `battle-log-entry ${type}`;
-        entry.textContent = message;
-        battleLog.appendChild(entry);
+                const enemyCard = enemyCardSlot.querySelector('.battle-card');
+                if (enemyCard) {
+                    enemyCard.classList.add('defeat');
+                    
+                    // Add skull for defeat
+                    const skull = document.createElement('div');
+                    skull.className = 'death-skull';
+                    skull.textContent = '💀';
+                    enemyCardSlot.style.position = 'relative';
+                    enemyCardSlot.appendChild(skull);
+                    setTimeout(() => skull.remove(), 1500);
+                }
+            } else {
+                enemyScore++;
+                const enemyCard = enemyCardSlot.querySelector('.battle-card');
+                if (enemyCard) {
+                    enemyCard.classList.add('victory');
+                    
+                    // Fire confetti for enemy victory
+                    fireConfetti();
+                    
+                    // Add confetti emoji
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti-emoji';
+                    confetti.textContent = '🎉';
+                    enemyCardSlot.style.position = 'relative';
+                    enemyCardSlot.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 1500);
+                    
+                    // Add winner banner
+                    const banner = document.createElement('div');
+                    banner.className = 'round-result-banner win';
+                    banner.textContent = '✅ GYŐZELEM!';
+                    enemyCardSlot.appendChild(banner);
+                    setTimeout(() => banner.remove(), 2000);
+                }
+                const playerCard = playerCardSlot.querySelector('.battle-card');
+                if (playerCard) {
+                    playerCard.classList.add('defeat');
+                    
+                    // Add skull for defeat
+                    const skull = document.createElement('div');
+                    skull.className = 'death-skull';
+                    skull.textContent = '💀';
+                    playerCardSlot.style.position = 'relative';
+                    playerCardSlot.appendChild(skull);
+                    setTimeout(() => skull.remove(), 1500);
+                }
+            }
+            
+            updateScoreboard();
+        }
         
-        // Auto-scroll to bottom
-        battleLog.scrollTop = battleLog.scrollHeight;
-    }
-    
-    function updateStatus(message) {
-        statusMessage.innerHTML = message;
-    }
-    
-    function showAutoSave() {
-        autoSaveIndicator.classList.add('show');
-        setTimeout(() => {
-            autoSaveIndicator.classList.remove('show');
-        }, 2000);
-    }
-    
-    // Event Listeners
-    startBattleBtn.addEventListener('click', function() {
-        if (battleSocket && battleSocket.readyState === WebSocket.OPEN) {
-            battleSocket.send(JSON.stringify({
-                action: 'start_battle'
-            }));
-            startBattleBtn.disabled = true;
-        } else {
-            addLog('❌ Nincs kapcsolat! Próbáld újra betölteni az oldalt.', 'error');
+        function fireConfetti() {
+            // Fire confetti using tsparticles
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731']
+            });
         }
-    });
-    
-    // Auto-save periodically during battle
-    setInterval(() => {
-        if (battleSocket && battleSocket.readyState === WebSocket.OPEN) {
-            battleSocket.send(JSON.stringify({
-                action: 'auto_save'
-            }));
+        
+        function handleBattleEnd(data) {
+            currentHarcId = data.harc_id;
+            const winner = data.winner;
+            
+            updateStatus(data.message);
+            roundCounter.textContent = `🏁 Harc befejezve!`;
+            
+            showAutoSave();
+            
+            // Fire massive confetti for final victory
+            if (winner === 'player') {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        confetti({
+                            particleCount: 150,
+                            angle: 60 + (i * 20),
+                            spread: 100,
+                            origin: { x: 0.3 + (i * 0.2), y: 0.5 },
+                            colors: ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#10b981']
+                        });
+                    }, i * 200);
+                }
+            }
+            
+            setTimeout(() => {
+                finalResult.textContent = data.message;
+                finalResult.className = `final-result ${winner === 'player' ? 'victory' : 'defeat'}`;
+                finalResult.classList.add('show');
+                
+                setTimeout(() => {
+                    if (winner === 'player') {
+                        window.location.href = `/player/game/${jatekId}/harc/${currentHarcId}/jutalom/`;
+                    } else {
+                        window.location.href = `/player/jatek/${jatekId}/`;
+                    }
+                }, 4000);
+            }, 1500);
         }
-    }, 30000); // Every 30 seconds
-    
-    // Initialize WebSocket connection
-    connectWebSocket();
-</script>
-{% endblock %}
+        
+        function updateScoreboard() {
+            const playerScoreEl = document.getElementById('player-score');
+            const enemyScoreEl = document.getElementById('enemy-score');
+            
+            playerScoreEl.style.transform = 'scale(1.3)';
+            enemyScoreEl.style.transform = 'scale(1.3)';
+            
+            playerScoreEl.textContent = playerScore;
+            enemyScoreEl.textContent = enemyScore;
+            
+            setTimeout(() => {
+                playerScoreEl.style.transform = 'scale(1)';
+                enemyScoreEl.style.transform = 'scale(1)';
+            }, 300);
+        }
+        
+        function updateStatus(message) {
+            if (statusText) {
+                statusText.textContent = message;
+            }
+        }
+        
+        function showAutoSave() {
+            autoSaveIndicator.classList.add('show');
+            setTimeout(() => {
+                autoSaveIndicator.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Event Listeners
+        startBattleBtn.addEventListener('click', function() {
+            if (battleSocket && battleSocket.readyState === WebSocket.OPEN) {
+                battleSocket.send(JSON.stringify({
+                    action: 'start_battle'
+                }));
+                startBattleBtn.disabled = true;
+                startBattleBtn.textContent = '⏳ Harc indul...';
+            } else {
+                updateStatus('❌ Nincs kapcsolat! Próbáld újra betölteni az oldalt.');
+            }
+        });
+        
+        // Auto-save periodically
+        setInterval(() => {
+            if (battleSocket && battleSocket.readyState === WebSocket.OPEN) {
+                battleSocket.send(JSON.stringify({
+                    action: 'auto_save'
+                }));
+            }
+        }, 30000);
+        
+        // Initialize
+        connectWebSocket();
+    </script>
+</body>
+</html>

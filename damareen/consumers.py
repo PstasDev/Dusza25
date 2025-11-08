@@ -45,7 +45,7 @@ class BattleConsumer(AsyncWebsocketConsumer):
         # Send initial connection message
         await self.send(text_data=json.dumps({
             'type': 'connection',
-            'message': '⚔️ Csatlakozva a harci rendszerhez...'
+            'message': '✅ Kapcsolat létrejött! Kattints a HARC INDÍTÁSA gombra!'
         }))
     
     async def disconnect(self, close_code):
