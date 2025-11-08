@@ -199,8 +199,11 @@ def ellenorzi_es_ad_achievementet(user, tipus, ertek=1):
             # Frissítjük a haladást
             player_ach.jelenlegi_haladás += ertek
             
+            # Ellenőrizzük, hogy most teljesült-e
+            teljesult_most = player_ach.jelenlegi_haladás >= achievement.cel_ertek
+            
             # Ha most teljesült, pontokat adunk
-            if player_ach.teljesitve:
+            if teljesult_most:
                 try:
                     profile = user.userprofile
                     profile.osszes_pontszam += achievement.pontok
@@ -212,7 +215,9 @@ def ellenorzi_es_ad_achievementet(user, tipus, ertek=1):
             
     except Exception as e:
         # Hibák esetén csendesen továbblépünk
-        pass
+        import traceback
+        print(f"Achievement hiba: {e}")
+        traceback.print_exc()
 
 
 def frissit_rangsort(user, gyozott):
@@ -228,17 +233,65 @@ def frissit_rangsort(user, gyozott):
         
         if gyozott:
             profile.gyozelem_hozzaad()
-            # Achievementek ellenőrzése
+            # Achievementek ellenőrzése - győzelmek számolása
             ellenorzi_es_ad_achievementet(user, 'gyozelem', 1)
-            ellenorzi_es_ad_achievementet(user, 'sorozat_gyozelem', 1)
             
-            # Sorozat achievementek
+            # Sorozat achievementek - újratöltjük a profilt a friss adatokért
+            profile.refresh_from_db()
+            
+            # 3-as sorozat ellenőrzése
             if profile.jelenlegi_sorozat >= 3:
-                ellenorzi_es_ad_achievementet(user, '3_sorozat', 0)
+                # Lekérjük vagy létrehozzuk a 3_sorozat achievement-et
+                try:
+                    achievement = Achievement.objects.get(tipus='3_sorozat')
+                    player_ach, created = PlayerAchievement.objects.get_or_create(
+                        jatekos=user,
+                        achievement=achievement,
+                        defaults={'jelenlegi_haladás': 0}
+                    )
+                    # Ha még nem teljesült, most teljesítjük
+                    if not player_ach.teljesitve:
+                        player_ach.jelenlegi_haladás = achievement.cel_ertek
+                        player_ach.save()
+                        # Pontok hozzáadása
+                        profile.osszes_pontszam += achievement.pontok
+                        profile.save()
+                except Achievement.DoesNotExist:
+                    pass
+            
+            # 5-ös sorozat ellenőrzése
             if profile.jelenlegi_sorozat >= 5:
-                ellenorzi_es_ad_achievementet(user, '5_sorozat', 0)
+                try:
+                    achievement = Achievement.objects.get(tipus='5_sorozat')
+                    player_ach, created = PlayerAchievement.objects.get_or_create(
+                        jatekos=user,
+                        achievement=achievement,
+                        defaults={'jelenlegi_haladás': 0}
+                    )
+                    if not player_ach.teljesitve:
+                        player_ach.jelenlegi_haladás = achievement.cel_ertek
+                        player_ach.save()
+                        profile.osszes_pontszam += achievement.pontok
+                        profile.save()
+                except Achievement.DoesNotExist:
+                    pass
+            
+            # 10-es sorozat ellenőrzése
             if profile.jelenlegi_sorozat >= 10:
-                ellenorzi_es_ad_achievementet(user, '10_sorozat', 0)
+                try:
+                    achievement = Achievement.objects.get(tipus='10_sorozat')
+                    player_ach, created = PlayerAchievement.objects.get_or_create(
+                        jatekos=user,
+                        achievement=achievement,
+                        defaults={'jelenlegi_haladás': 0}
+                    )
+                    if not player_ach.teljesitve:
+                        player_ach.jelenlegi_haladás = achievement.cel_ertek
+                        player_ach.save()
+                        profile.osszes_pontszam += achievement.pontok
+                        profile.save()
+                except Achievement.DoesNotExist:
+                    pass
         else:
             profile.vereseg_hozzaad()
             ellenorzi_es_ad_achievementet(user, 'vereseg', 1)

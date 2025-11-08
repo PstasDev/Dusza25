@@ -300,11 +300,19 @@ class BattleConsumer(AsyncWebsocketConsumer):
     
     @database_sync_to_async
     def complete_battle(self, harc_id, jatekos_gyozott):
-        """Mark battle as complete"""
+        """Mark battle as complete and update leaderboard"""
+        from .game_logic import frissit_rangsort
+        
         harc = Harc.objects.get(id=harc_id)
         harc.befejezve = True
         harc.jatekos_gyozott = jatekos_gyozott
         harc.save()
+        
+        # Rangsor és achievementek frissítése
+        if not harc.rangsor_frissitve:
+            frissit_rangsort(self.user, jatekos_gyozott)
+            harc.rangsor_frissitve = True
+            harc.save(update_fields=['rangsor_frissitve'])
     
     @database_sync_to_async
     def auto_save_game(self):
