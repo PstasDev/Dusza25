@@ -472,11 +472,19 @@
             text-shadow: 0 3px 6px rgba(0,0,0,0.8);
         }
         
-        /* Animations - Fixed to prevent flashing */
+        /* Animations - Smooth and realistic card flip */
         @keyframes cardFlipIn {
             0% { 
-                transform: rotateY(180deg) scale(0.9); 
+                transform: rotateY(180deg) scale(0.8); 
                 opacity: 0; 
+            }
+            40% {
+                transform: rotateY(90deg) scale(0.95);
+                opacity: 0.5;
+            }
+            60% {
+                transform: rotateY(45deg) scale(0.98);
+                opacity: 0.8;
             }
             100% { 
                 transform: rotateY(0deg) scale(1); 
@@ -485,8 +493,18 @@
         }
         
         @keyframes cardFlipToFront {
-            0% { transform: rotateY(180deg); }
-            100% { transform: rotateY(0deg); }
+            0% { 
+                transform: rotateY(180deg) scale(1);
+                opacity: 1;
+            }
+            50% { 
+                transform: rotateY(90deg) scale(1.05);
+                opacity: 0.7;
+            }
+            100% { 
+                transform: rotateY(0deg) scale(1);
+                opacity: 1;
+            }
         }
         
         @keyframes cardAttack {
@@ -591,7 +609,7 @@
         }
         
         .battle-card.revealed {
-            animation: cardFlipIn 0.8s ease-out forwards;
+            animation: cardFlipIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         
         .battle-card.attacking {
@@ -976,7 +994,7 @@
                 if (playerCard) {
                     playerCard.classList.add('victory');
                     
-                    // Fire confetti for player victory
+                    // Fire confetti for player victory ONLY
                     fireConfetti();
                     
                     // Add confetti emoji
@@ -1012,16 +1030,7 @@
                 if (enemyCard) {
                     enemyCard.classList.add('victory');
                     
-                    // Fire confetti for enemy victory
-                    fireConfetti();
-                    
-                    // Add confetti emoji
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti-emoji';
-                    confetti.textContent = '🎉';
-                    enemyCardSlot.style.position = 'relative';
-                    enemyCardSlot.appendChild(confetti);
-                    setTimeout(() => confetti.remove(), 1500);
+                    // NO confetti for enemy victory - only winner banner
                     
                     // Add winner banner
                     const banner = document.createElement('div');
