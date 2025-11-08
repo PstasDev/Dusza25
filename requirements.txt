@@ -9,6 +9,7 @@ cryptography==43.0.3
 daphne==4.1.2
 Django==5.1.4
 python-decouple==3.8
+gunicorn==23.0.0
 hyperlink==21.0.0
 idna==3.10
 incremental==24.7.2
@@ -23,4 +24,6 @@ Twisted==24.11.0
 txaio==23.1.1
 typing_extensions==4.12.2
 tzdata==2024.2
+uvicorn==0.32.1
+uvicorn-worker==0.2.0
 zope.interface==7.2
