@@ -10,6 +10,8 @@ A játékosok saját kártyagyűjteményüket fejlesztik kazamaták ellen vívot
 
 ## 🚀 Telepítés és indítás
 
+Ez a helyi teszteléshez es játékhoz készült útmutató, deployolni rendszerkönyezettől függően, bármilyen ASGI motorral, daphne helyett a gunicornt ajánljuk, UvicornWorker kikötéssel.
+
 ### 1. Előfeltételek
 - Python 3.8 vagy újabb
 - pip (Python package manager)
