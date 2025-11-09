@@ -13,17 +13,17 @@ A játékosok saját kártyagyűjteményüket fejlesztik kazamaták ellen vívot
 ### 1. Előfeltételek
 - Python 3.8 vagy újabb
 - pip (Python package manager)
+- Libraryk telepítése, preferáltan virtualenv-ben. Minden megtalálható a requirements.txt fájlban.
 
 ### 2. Projekt előkészítése
 
 ```cmd
-cd c:\Users\btndb\Desktop\CodingProgramming\Dusza25
+cd .\Dusza25
 ```
 
-### 3. Django migrációk futtatása
+### 3. Django migrációk futtatása, ha a libraryk már telepítve vannak
 
-```cmd
-python manage.py makemigrations
+```cmd
 python manage.py migrate
 ```
 
@@ -77,6 +77,7 @@ Az alkalmazás elérhető lesz: **http://127.0.0.1:8000/**
   - Vezérkártyák származtatása (sebzés vagy életerő duplázás)
   - Kazamaták összeállítása (kártyák sorrendje)
 - **Játékmester felület:** Kezdő gyűjtemény beállítása
+- **Mindent lehet a felhasználói felületen is kezelni, nem kell a Django Admint használni.**
 
 #### 🎮 Játékos
 1. **Játék indítása:** Válassz egy játékkörnyezetet
@@ -277,6 +278,13 @@ Nincs, minden feladat követelmény teljesült!
 - Nem létező objektumok kezelése (404)
 - Tranzakciók használata konzisztencia biztosítására
 
+## 😱 Fejlesztési folyamat során felmerülő problémák 
+
+- Szándékosan olyan technológiákat használtunk, melyeket már jól ismerünk típushibáit már korábbi projektekben kiaknáztuk.
+    - Ezen okból lehet különös, hogy static fájlokat **nem** kezelünk, hanem bele vannak templatelve a html fájlokba, így sokkal gyorsabb deployolni stabilan, nem kell a static kezelést külön beállítani.
+- Az animációk elkészítése, különösen a BattleArenába nehézkes volt, de igyekeztünk látványosat alkotni.
+- Nem futottunk egyéb problémákba.
+
 ## 🔮 Továbbfejlesztési lehetőségek
 
 1. **Multiplayer mód:** Játékosok egymás ellen
@@ -294,6 +302,12 @@ Nincs, minden feladat követelmény teljesült!
 
 Ílllyj - 2025
 (mi sem tudjuk leírni a csapatnevünket, mert elfelejtettük)
+
+Kőbányai Szent László Gimnázium, 10. F (23F), 2025. 11. 07-09.
+
+- Balla Botond
+- Balla Letícia (igen ikrek vagyunk)
+- Szabó Réka Hanna
 
 ---
 
